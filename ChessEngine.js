@@ -3813,6 +3813,11 @@ var _unmove = Module["_unmove"] = function() {
 };
 
 /** @type {function(...*):?} */
+var _listPieces = Module["_listPieces"] = function() {
+  return (_listPieces = Module["_listPieces"] = Module["asm"]["listPieces"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
 var ___original_main = Module["___original_main"] = function() {
   return (___original_main = Module["___original_main"] = Module["asm"]["__original_main"]).apply(null, arguments);
 };
