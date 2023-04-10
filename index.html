@@ -19,6 +19,10 @@
 </head>
 <body>
 <div class="board" id="board"></div>
+<button id="unmake">Unmake Move</button>
+<label for="moveFlag">Move flag</label><input type="number" id="moveFlag" value="0"/>
+<label for="promotion">Promotion type</label><input type="number" id="promotion" value="0"/>
+<label for="player">Player color</label><input type="number" id="player" value="0"/>
 <div id="output" style="width: 100%; overflow: hidden"></div>
 <script type="text/javascript" src="ChessEngine.js"></script>
 <script type="module">
@@ -43,6 +47,11 @@
 
     window.board.enableMoveInput(inputHandler)
 
+    document.getElementById("unmake").addEventListener("click", function (){
+        let fen = Module.ccall("unmove",'string')
+        window.board.setPosition(fen,false)
+    })
+
     function inputHandler(event) {
         console.log(event)
         window.board.removeMarkers(MARKER_TYPE.frame)
@@ -52,10 +61,18 @@
                 return true
             case INPUT_EVENT_TYPE.validateMoveInput:
                 log(`validateMoveInput: ${event.squareFrom}-${event.squareTo}`)
-				let fen = Module.ccall('move','string',['number','number'],[getSquareIndex(event.squareFrom),getSquareIndex(event.squareTo)])
-				window.board.setPosition(fen,false);
+                let moveFlag = document.getElementById("moveFlag").value
+                let promotionType = document.getElementById("promotion").value
+                let player = document.getElementById("player").value
+
+                console.log(moveFlag,promotionType,player);
+
+				let fen = Module.ccall('move','string',['number','number','number','number','number'],[getSquareIndex(event.squareFrom),getSquareIndex(event.squareTo),moveFlag,promotionType,player])
+				window.board.setPosition(fen,false)
+                break
             case INPUT_EVENT_TYPE.moveInputCanceled:
                 log(`moveInputCanceled`)
+                break
         }
     }
 

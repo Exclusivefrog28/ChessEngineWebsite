@@ -3808,6 +3808,11 @@ var _move = Module["_move"] = function() {
 };
 
 /** @type {function(...*):?} */
+var _unmove = Module["_unmove"] = function() {
+  return (_unmove = Module["_unmove"] = Module["asm"]["unmove"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
 var ___original_main = Module["___original_main"] = function() {
   return (___original_main = Module["___original_main"] = Module["asm"]["__original_main"]).apply(null, arguments);
 };
