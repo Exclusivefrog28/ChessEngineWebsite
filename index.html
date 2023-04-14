@@ -78,6 +78,7 @@
                     }
                 }
                 let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
+                console.log(fen)
                 window.board.setPosition(fen, false)
                 break
             case INPUT_EVENT_TYPE.moveInputCanceled:
