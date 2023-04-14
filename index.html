@@ -53,30 +53,32 @@
         console.log(Module.ccall('listPieces', 'string'))
     })
 
+    let moves;
     function inputHandler(event) {
         console.log(event)
         window.board.removeMarkers(MARKER_TYPE.frame)
         window.board.removeMarkers(MARKER_TYPE.dot)
+
         switch (event.type) {
             case INPUT_EVENT_TYPE.moveInputStarted:
                 log(`moveInputStarted: ${event.square}`)
-                let moves = JSON.parse(Module.ccall('getMoves', 'string', ['number'], [getSquareIndex(event.square)]))
+                moves = JSON.parse(Module.ccall('getMoves', 'string', ['number'], [getSquareIndex(event.square)]))
                 console.log(moves)
-                // for (let i = 0; i < moves.length; i++) {
-                //     window.board.addMarker(MARKER_TYPE.dot, moves[i])
-                // }
+                for (let i = 0; i < moves.length; i++) {
+                    window.board.addMarker(MARKER_TYPE.dot, moves[i].end)
+                }
                 return true
             case INPUT_EVENT_TYPE.validateMoveInput:
                 log(`validateMoveInput: ${event.squareFrom}-${event.squareTo}`)
-                let moveFlag = document.getElementById("moveFlag").value
-                let promotionType = document.getElementById("promotion").value
-                let player = document.getElementById("player").value
-                let start = getSquareIndex(event.squareFrom)
-                let end = getSquareIndex(event.squareTo)
-                let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [start, end, moveFlag, promotionType, player])
+                let move;
+                for (let i = 0; i < moves.length; i++) {
+                    if(moves[i].end === event.squareTo){
+                        move = moves[i];
+                        break;
+                    }
+                }
+                let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
                 window.board.setPosition(fen, false)
-                console.log(`${start} -> ${end}`)
-                console.log(Module.ccall('listPieces', 'string'))
                 break
             case INPUT_EVENT_TYPE.moveInputCanceled:
                 log(`moveInputCanceled`)
