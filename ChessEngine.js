@@ -928,7 +928,6 @@ var tempI64;
       abortOnCannotGrowMemory(requestedSize);
     }
 
-  
   var SYSCALLS = {varargs:undefined,get:function() {
         SYSCALLS.varargs += 4;
         var ret = HEAP32[(((SYSCALLS.varargs)-(4))>>2)];
@@ -937,6 +936,56 @@ var tempI64;
         var ret = UTF8ToString(ptr);
         return ret;
       }};
+  function _fd_close(fd) {
+      return 52;
+    }
+
+  function convertI32PairToI53Checked(lo, hi) {
+      return ((hi + 0x200000) >>> 0 < 0x400001 - !!lo) ? (lo >>> 0) + hi * 4294967296 : NaN;
+    }
+  
+  
+  
+  
+  function _fd_seek(fd, offset_low, offset_high, whence, newOffset) {
+      return 70;
+    }
+
+  var printCharBuffers = [null,[],[]];
+  function printChar(stream, curr) {
+      var buffer = printCharBuffers[stream];
+      if (curr === 0 || curr === 10) {
+        (stream === 1 ? out : err)(UTF8ArrayToString(buffer, 0));
+        buffer.length = 0;
+      } else {
+        buffer.push(curr);
+      }
+    }
+  
+  function flush_NO_FILESYSTEM() {
+      // flush anything remaining in the buffers during shutdown
+      if (printCharBuffers[1].length) printChar(1, 10);
+      if (printCharBuffers[2].length) printChar(2, 10);
+    }
+  
+  
+  function _fd_write(fd, iov, iovcnt, pnum) {
+      // hack to support printf in SYSCALLS_REQUIRE_FILESYSTEM=0
+      var num = 0;
+      for (var i = 0; i < iovcnt; i++) {
+        var ptr = HEAPU32[((iov)>>2)];
+        var len = HEAPU32[(((iov)+(4))>>2)];
+        iov += 8;
+        for (var j = 0; j < len; j++) {
+          printChar(fd, HEAPU8[ptr+j]);
+        }
+        num += len;
+      }
+      HEAPU32[((pnum)>>2)] = num;
+      return 0;
+    }
+
+  
   function _proc_exit(code) {
       EXITSTATUS = code;
       if (!keepRuntimeAlive()) {
@@ -1055,7 +1104,10 @@ var wasmImports = {
   "__cxa_throw": ___cxa_throw,
   "abort": _abort,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
-  "emscripten_resize_heap": _emscripten_resize_heap
+  "emscripten_resize_heap": _emscripten_resize_heap,
+  "fd_close": _fd_close,
+  "fd_seek": _fd_seek,
+  "fd_write": _fd_write
 };
 var asm = createWasm();
 /** @type {function(...*):?} */
@@ -1094,6 +1146,11 @@ var _getAttacks = Module["_getAttacks"] = function() {
 };
 
 /** @type {function(...*):?} */
+var _setFen = Module["_setFen"] = function() {
+  return (_setFen = Module["_setFen"] = Module["asm"]["setFen"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
 var ___original_main = Module["___original_main"] = function() {
   return (___original_main = Module["___original_main"] = Module["asm"]["__original_main"]).apply(null, arguments);
 };
@@ -1126,6 +1183,11 @@ var stackAlloc = function() {
 /** @type {function(...*):?} */
 var ___cxa_is_pointer_type = function() {
   return (___cxa_is_pointer_type = Module["asm"]["__cxa_is_pointer_type"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var dynCall_jiji = Module["dynCall_jiji"] = function() {
+  return (dynCall_jiji = Module["dynCall_jiji"] = Module["asm"]["dynCall_jiji"]).apply(null, arguments);
 };
 
 
