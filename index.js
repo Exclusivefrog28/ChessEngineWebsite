@@ -38,6 +38,15 @@ document.getElementById("unmake").addEventListener("click", function () {
     console.log(Module.ccall('listPieces', 'string'))
 })
 
+document.getElementById("perftButton").addEventListener("click", function () {
+    let start = new Date().getTime();
+    let depth = document.getElementById("depth").value
+    let fen = document.getElementById("fen").value
+    let nodes = Module.ccall("runPerft", 'number', ['number','string'], [depth,fen])
+    let end = new Date().getTime();
+    log(`perft ${depth}: ${nodes} time: ${end - start}ms`)
+})
+
 let moves;
 function inputHandler(event) {
     console.log(event)

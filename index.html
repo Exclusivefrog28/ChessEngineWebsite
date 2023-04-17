@@ -20,6 +20,15 @@
 <body>
 <div class="board" id="board"></div>
 <button id="unmake">Unmake Move</button>
+<label>
+    FEN
+    <input id="fen" type="text">
+</label>
+<label>
+    Depth
+    <input id="depth" type="number">
+</label>
+<button id="perftButton">Run perft</button>
 <div id="output" style="width: 100%; overflow: hidden"></div>
 <script type="text/javascript" src="ChessEngine.js"></script>
 <script type="module" src="index.js">
