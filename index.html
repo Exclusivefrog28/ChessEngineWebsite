@@ -6,30 +6,38 @@
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
     <link rel="stylesheet" href="../assets/chessboard.css"/>
     <link rel="stylesheet" href="../assets/extensions/markers/markers.css"/>
+    <link rel="stylesheet" href="styles.css"/>
 
-    <style>
-        div.board {
-            float: left;
-            width: 40vw;
-            height: 40vw;
-            margin-right: 0.2vw;
-            margin-bottom: 0.2vw;
-        }
-    </style>
 </head>
-<body>
-<div class="board" id="board"></div>
-<button id="unmake">Unmake Move</button>
-<label>
-    FEN
-    <input id="fen" type="text">
-</label>
-<label>
-    Depth
-    <input id="depth" type="number">
-</label>
-<button id="perftButton">Run perft</button>
-<div id="output" style="width: 100%; overflow: hidden"></div>
+<body style="background-color: #333333;">
+<div class="container">
+    <div class="gameboard">
+        <div class="board" id="board"></div>
+        <div class='button -regular center' id="unmake" style="width: 50%">Unmake Move</div>
+    </div>
+
+    <div class="perft">
+        <form>
+            <div class="group">
+                <input id="fen" type="text" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>FEN</label>
+            </div>
+
+            <div class="group">
+                <input id="depth" type="number" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Depth</label>
+            </div>
+        </form>
+
+        <div class='button -regular center' id="perftButton" style="height: 5%">Run perft</div>
+
+        <div id="output" style="width: 100%; overflow: hidden; color: whitesmoke"></div>
+    </div>
+</div>
 <script type="text/javascript" src="ChessEngine.js"></script>
 <script type="module" src="index.js">
 </script>
