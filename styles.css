@@ -1,16 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
-body{
+body {
     font-family: 'Roboto', sans-serif;
 }
 
-.container{
+.container {
     display: flex;
     gap: 10px;
     padding: 10px;
 }
 
-.gameboard{
+.gameboard {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -50,9 +50,8 @@ input:focus {
     outline: none;
 }
 
-/* LABEL ======================================= */
 label {
-    color: #999;
+    color: #666;
     font-size: 18px;
     font-weight: normal;
     position: absolute;
@@ -64,14 +63,12 @@ label {
     -webkit-transition: 0.2s ease all;
 }
 
-/* active state */
 input:focus ~ label, input:valid ~ label {
     top: -20px;
     font-size: 14px;
-    color: #5264AE;
+    color: teal;
 }
 
-/* BOTTOM BARS ================================= */
 .bar {
     position: relative;
     display: block;
@@ -84,7 +81,7 @@ input:focus ~ label, input:valid ~ label {
     width: 0;
     bottom: 1px;
     position: absolute;
-    background: #5264AE;
+    background: teal;
     transition: 0.2s ease all;
     -moz-transition: 0.2s ease all;
     -webkit-transition: 0.2s ease all;
@@ -98,12 +95,10 @@ input:focus ~ label, input:valid ~ label {
     right: 50%;
 }
 
-/* active state */
 input:focus ~ .bar:before, input:focus ~ .bar:after {
     width: 50%;
 }
 
-/* HIGHLIGHTER ================================== */
 .highlight {
     position: absolute;
     height: 60%;
@@ -114,37 +109,13 @@ input:focus ~ .bar:before, input:focus ~ .bar:after {
     opacity: 0.5;
 }
 
-/* active state */
 input:focus ~ .highlight {
-    -webkit-animation: inputHighlighter 0.3s ease;
-    -moz-animation: inputHighlighter 0.3s ease;
     animation: inputHighlighter 0.3s ease;
-}
-
-/* ANIMATIONS ================ */
-@-webkit-keyframes inputHighlighter {
-    from {
-        background: #5264AE;
-    }
-    to {
-        width: 0;
-        background: transparent;
-    }
-}
-
-@-moz-keyframes inputHighlighter {
-    from {
-        background: #5264AE;
-    }
-    to {
-        width: 0;
-        background: transparent;
-    }
 }
 
 @keyframes inputHighlighter {
     from {
-        background: #5264AE;
+        background: teal;
     }
     to {
         width: 0;
@@ -180,14 +151,17 @@ input:focus ~ .highlight {
     justify-content: center;
     align-items: center;
 }
+
 .button:hover {
     transition: all 150ms linear;
     opacity: 0.85;
 }
+
 .button:active {
     transition: all 150ms linear;
     opacity: 0.75;
 }
+
 .button:focus {
     outline: 1px dotted #959595;
     outline-offset: -4px;
@@ -197,11 +171,13 @@ input:focus ~ .highlight {
     color: #202129;
     background-color: #f2f2f2;
 }
+
 .button.-regular:hover {
     color: #202129;
     background-color: #e1e2e2;
     opacity: 1;
 }
+
 .button.-regular:active {
     background-color: #d5d6d6;
     opacity: 1;
