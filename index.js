@@ -38,6 +38,13 @@ document.getElementById("unmake").addEventListener("click", function () {
     evaluate()
 })
 
+document.getElementById("engineMove").addEventListener("click", function () {
+    let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [4]))
+    let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
+    window.board.setPosition(fen, true)
+    evaluate()
+})
+
 document.getElementById("perftButton").addEventListener("click", function () {
     let start = new Date().getTime();
     let depth = document.getElementById("depth").value

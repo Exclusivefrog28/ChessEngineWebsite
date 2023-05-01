@@ -16,6 +16,12 @@ body {
     align-items: center;
 }
 
+.boardButtons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 .perft {
     display: flex;
     flex-direction: column;
@@ -182,3 +188,4 @@ input:focus ~ .highlight {
     background-color: #d5d6d6;
     opacity: 1;
 }
+
