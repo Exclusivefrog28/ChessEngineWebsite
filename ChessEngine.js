@@ -6,7 +6,7 @@ var quit_ = (status, toThrow) => {
     throw toThrow
 };
 var ENVIRONMENT_IS_WEB = true;
-var ENVIRONMENT_IS_WORKER = false;
+var ENVIRONMENT_IS_WORKER = true;
 var scriptDirectory = "";
 
 function locateFile(path) {

@@ -1,20 +1,9 @@
-import {INPUT_EVENT_TYPE, Chessboard} from "../src/cm-chessboard/Chessboard.js"
-import {FEN} from "../src/cm-chessboard/model/Position.js"
-import {MARKER_TYPE, Markers} from "../src/cm-chessboard/extensions/markers/Markers.js"
-import {PromotionDialog} from "../src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
-import {COLOR, PIECE} from "./src/cm-chessboard/Chessboard.js";
+import {INPUT_EVENT_TYPE, Chessboard} from "/src/cm-chessboard/Chessboard.js"
+import {FEN} from "/src/cm-chessboard/model/Position.js"
+import {MARKER_TYPE, Markers} from "/src/cm-chessboard/extensions/markers/Markers.js"
+import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
+import {COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js";
 
-function getSquareIndex(square) {
-    const file = square.charCodeAt(0) - 97;
-    const rank = 8 - parseInt(square.charAt(1));
-    return (rank * 8) + file;
-}
-
-function getSquare(index) {
-    const file = String.fromCharCode(97 + index % 8);
-    const rank = 8 - Math.floor(index / 8);
-    return file + rank;
-}
 
 window.board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
@@ -23,46 +12,52 @@ window.board = new Chessboard(document.getElementById("board"), {
     extensions: [{class: PromotionDialog}, {class: Markers}]
 })
 
-function evaluate() {
-    let evaluation = Module.ccall('eval', 'int')
-    console.log(evaluation)
+const engine = new Worker("engine.js")
 
+let moves
+
+engine.onmessage = function (e) {
+    const message = e.data
+
+    switch (message.task) {
+        case 'search':
+            window.board.setPosition(message.fen, true)
+            break
+        case 'eval':
+            console.log(message.score)
+            break
+        case 'move':
+            window.board.setPosition(message.fen, true)
+            break
+        case 'getMoves':
+            moves = message.moves
+            for (let i = 0; i < moves.length; i++) {
+                window.board.addMarker(MARKER_TYPE.dot, moves[i].end)
+            }
+            break
+        case 'unMakeMove':
+            window.board.setPosition(message.fen, true)
+            break
+        case 'perft':
+            log(`perft ${message.depth}: ${message.nodes} time: ${message.time}ms`)
+            break
+        case 'ready':
+            window.board.enableMoveInput(inputHandler)
+            document.getElementById("engineMove").addEventListener("click", () => {
+                engine.postMessage({task: 'search'})
+            })
+            document.getElementById("unmake").addEventListener("click", function () {
+                engine.postMessage({task: 'unMakeMove'})
+            })
+            document.getElementById("perftButton").addEventListener("click", function () {
+                let depth = document.getElementById("depth").value
+                let fen = document.getElementById("fen").value
+
+                engine.postMessage({task: 'perft', depth: depth, fen: fen})
+            })
+            break
+    }
 }
-
-Module.ccall("init")
-window.board.enableMoveInput(inputHandler)
-
-document.getElementById("unmake").addEventListener("click", function () {
-    let fen = Module.ccall("unmove", 'string')
-    window.board.setPosition(fen, true)
-    evaluate()
-})
-
-document.getElementById("engineMove").addEventListener("click", async () => {
-    await search()
-})
-
-async function search() {
-
-    let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [4]))
-    let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
-    setTimeout(() => {
-        window.board.setPosition(fen, true)
-    }, 1)
-    evaluate()
-
-}
-
-document.getElementById("perftButton").addEventListener("click", function () {
-    let start = new Date().getTime();
-    let depth = document.getElementById("depth").value
-    let fen = document.getElementById("fen").value
-    let nodes = Module.ccall("runPerft", 'number', ['number', 'string'], [depth, fen])
-    let end = new Date().getTime();
-    log(`perft ${depth}: ${nodes} time: ${end - start}ms`)
-})
-
-let moves;
 
 function inputHandler(event) {
     window.board.removeMarkers(MARKER_TYPE.frame)
@@ -70,10 +65,9 @@ function inputHandler(event) {
 
     switch (event.type) {
         case INPUT_EVENT_TYPE.moveInputStarted:
-            moves = JSON.parse(Module.ccall('getMoves', 'string', ['number'], [getSquareIndex(event.square)]))
-            for (let i = 0; i < moves.length; i++) {
-                window.board.addMarker(MARKER_TYPE.dot, moves[i].end)
-            }
+
+            engine.postMessage({task: 'getMoves', square: event.square})
+
             return true
         case INPUT_EVENT_TYPE.validateMoveInput:
             let move
@@ -82,6 +76,9 @@ function inputHandler(event) {
                     move = moves[i]
                     break
                 }
+            }
+            if(move == null) {
+                return false
             }
 
             if (move.promotionType != 0) {
@@ -104,14 +101,10 @@ function inputHandler(event) {
                             move.promotionType = 5
                             break
                     }
-                    let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
-                    window.board.setPosition(fen, true)
-                    evaluate()
+                    engine.postMessage({task: 'move', move: move})
                 })
             } else {
-                let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
-                window.board.setPosition(fen, true)
-                evaluate()
+                engine.postMessage({task: 'move', move: move})
                 break
             }
             return true
