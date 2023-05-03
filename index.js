@@ -38,12 +38,20 @@ document.getElementById("unmake").addEventListener("click", function () {
     evaluate()
 })
 
-document.getElementById("engineMove").addEventListener("click", function () {
+document.getElementById("engineMove").addEventListener("click", async () => {
+    await search()
+})
+
+async function search() {
+
     let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [4]))
     let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
-    window.board.setPosition(fen, true)
+    setTimeout(() => {
+        window.board.setPosition(fen, true)
+    }, 1)
     evaluate()
-})
+
+}
 
 document.getElementById("perftButton").addEventListener("click", function () {
     let start = new Date().getTime();
@@ -100,7 +108,7 @@ function inputHandler(event) {
                     window.board.setPosition(fen, true)
                     evaluate()
                 })
-            } else{
+            } else {
                 let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
                 window.board.setPosition(fen, true)
                 evaluate()
