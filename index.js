@@ -22,6 +22,7 @@ engine.onmessage = function (e) {
     switch (message.task) {
         case 'search':
             window.board.setPosition(message.fen, true)
+            markMove(message.start, message.end)
             break
         case 'eval':
             console.log(message.score)
@@ -37,6 +38,7 @@ engine.onmessage = function (e) {
             break
         case 'unMakeMove':
             window.board.setPosition(message.fen, true)
+            window.board.removeMarkers(MARKER_TYPE.square)
             break
         case 'perft':
             log(`perft ${message.depth}: ${message.nodes} time: ${message.time}ms`)
@@ -81,6 +83,8 @@ function inputHandler(event) {
                 return false
             }
 
+            markMove(event.squareFrom, event.squareTo)
+
             if (move.promotionType != 0) {
                 window.board.showPromotionDialog(event.squareTo, (move.player == 0) ? COLOR.white : COLOR.black, (result) => {
                     switch (result.piece) {
@@ -111,6 +115,12 @@ function inputHandler(event) {
         case INPUT_EVENT_TYPE.moveInputCanceled:
             break
     }
+}
+
+function markMove(start, end){
+    window.board.removeMarkers(MARKER_TYPE.square)
+    window.board.addMarker(MARKER_TYPE.square, start)
+    window.board.addMarker(MARKER_TYPE.square, end)
 }
 
 const output = document.getElementById("output")

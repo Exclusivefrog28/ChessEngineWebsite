@@ -15,7 +15,7 @@ if (typeof importScripts === "function") {
             case "search": {
                 let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [4]))
                 let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
-                postMessage({task: message.task, fen: fen})
+                postMessage({task: message.task, fen: fen, start: move.start, end: move.end})
                 break;
             }
 
