@@ -12,6 +12,34 @@ window.board = new Chessboard(document.getElementById("board"), {
     extensions: [{class: PromotionDialog}, {class: Markers}]
 })
 
+const perftFENs = [
+    FEN.start,
+    "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+    "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
+    "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
+    "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8",
+]
+
+perftFENs.forEach(fen => {
+    new Chessboard(document.getElementById("perft" + (perftFENs.indexOf(fen))), {
+        position: fen,
+        extensions: [{class: Markers}]
+    })
+})
+
+document.addEventListener('DOMContentLoaded', function() {
+    let elems = document.querySelectorAll('.carousel');
+
+    let instances = M.Carousel.init(elems, {
+        onCycleTo: function(item) {
+            let index = item.childNodes[1].id.slice(-1)
+            let fenInput = document.getElementById("fen")
+            fenInput.value = perftFENs[index]
+        }
+    });
+
+});
+
 const engine = new Worker("engine.js")
 
 let moves
@@ -21,6 +49,7 @@ engine.onmessage = function (e) {
 
     switch (message.task) {
         case 'search':
+            document.getElementById("engineLoading").style.visibility = "hidden"
             window.board.setPosition(message.fen, true)
             markMove(message.start, message.end)
             break
@@ -42,16 +71,19 @@ engine.onmessage = function (e) {
             break
         case 'perft':
             log(`perft ${message.depth}: ${message.nodes} time: ${message.time}ms`)
+            document.getElementById("perftLoading").style.display = "none"
             break
         case 'ready':
             window.board.enableMoveInput(inputHandler)
             document.getElementById("engineMove").addEventListener("click", () => {
+                document.getElementById("engineLoading").style.visibility = "visible"
                 engine.postMessage({task: 'search'})
             })
             document.getElementById("unmake").addEventListener("click", function () {
                 engine.postMessage({task: 'unMakeMove'})
             })
             document.getElementById("perftButton").addEventListener("click", function () {
+                document.getElementById("perftLoading").style.display = ""
                 let depth = document.getElementById("depth").value
                 let fen = document.getElementById("fen").value
 

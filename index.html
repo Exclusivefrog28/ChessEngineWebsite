@@ -1,49 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+<script>
+    const theme = localStorage.getItem('theme');
+    document.documentElement.setAttribute('theme', 'dark');
+</script>
 <head>
     <meta charset="UTF-8">
-    <title>cm-chessboard</title>
+    <title>Chess Engine</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css" media="screen,projection"/>
+
     <link rel="stylesheet" href="../assets/chessboard.css"/>
     <link rel="stylesheet" href="../assets/extensions/markers/markers.css"/>
     <link rel="stylesheet" href="../assets/extensions/promotion-dialog/promotion-dialog.css"/>
-    <link rel="stylesheet" href="styles.css"/>
-
 </head>
-<body style="background-color: #333333;">
+<body style="background-color: var(--background-color)">
 <div class="container">
-    <div class="gameboard">
-        <div class="board" id="board"></div>
-        <div class="boardButtons">
-            <div class='button -regular center' id="unmake" style="width: 100%">Unmake Move</div>
-            <div class='button -regular center' id="engineMove" style="width: 100%">Make Engine Move</div>
+    <div class="row">
+        <div class="col s8 offset-s2" id="board"></div>
+        <div class="progress col s6 offset-s3" id="engineLoading" style="visibility : hidden">
+            <div class="indeterminate"></div>
         </div>
     </div>
-
-
-    <div class="perft">
-        <form>
-            <div class="group">
-                <input id="fen" type="text" required>
-                <span class="highlight"></span>
-                <span class="bar"></span>
-                <label>FEN</label>
-            </div>
-
-            <div class="group">
-                <input id="depth" type="number" required>
-                <span class="highlight"></span>
-                <span class="bar"></span>
-                <label>Depth</label>
-            </div>
-        </form>
-
-        <div class='button -regular center' id="perftButton" style="height: 5%">Run perft</div>
-
-        <div id="output" style="width: 100%; overflow: hidden; color: whitesmoke"></div>
+    <div class="row" style="gap: 20px;">
+        <a class="col s3 offset-s3 waves-effect waves-light btn" id="unmake">Unmake Move</a>
+        <a class="col s3 offset-s6 waves-effect waves-light btn" id="engineMove">Make Engine Move</a>
     </div>
+
+    <div class="section"></div>
+    <div class="divider"></div>
+
+    <div class="row">
+        <form class="row col s8">
+            <div class="carousel col s8">
+                <a class="carousel-item">
+                    <div id="perft0"></div>
+                </a>
+                <a class="carousel-item">
+                    <div id="perft1"></div>
+                </a>
+                <a class="carousel-item">
+                    <div id="perft2"></div>
+                </a>
+                <a class="carousel-item">
+                    <div id="perft3"></div>
+                </a>
+                <a class="carousel-item">
+                    <div id="perft4"></div>
+                </a>
+            </div>
+            <div class="input-field outlined col s8">
+                <input id="fen" type="text" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1">
+                <label for="fen">FEN</label>
+            </div>
+            <p class="range-field col s8">
+                <label for="depth">Depth</label>
+                <input type="range" id="depth" min="1" max="10" value="3"/>
+            </p>
+
+            <a class="waves-effect waves-light btn col s6 offset-s1" id="perftButton">Run perft</a>
+
+        </form>
+        <div class="col s2 offset-s8">
+            <div id="output" style="overflow: hidden">
+                <div class="section"></div>
+            </div>
+            <div class="progress" id="perftLoading" style="display: none">
+                <div class="indeterminate"></div>
+            </div>
+        </div>
+    </div>
+    <div class="section"></div>
 </div>
 <script type="module" src="index.js"></script>
 <script type="module" src="engine.js"></script>
+<script src="materialize/js/materialize.min.js"></script>
 </body>
 </html>
