@@ -8,7 +8,7 @@ import {COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js";
 window.board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
     assetsUrl: "../assets/",
-    style: {pieces: {file: "staunty.svg"}},
+    style: {cssClass: "default", pieces: {file: "staunty.svg"}},
     extensions: [{class: PromotionDialog}, {class: Markers}]
 })
 
@@ -27,11 +27,11 @@ perftFENs.forEach(fen => {
     })
 })
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     let elems = document.querySelectorAll('.carousel');
 
     let instances = M.Carousel.init(elems, {
-        onCycleTo: function(item) {
+        onCycleTo: function (item) {
             let index = item.childNodes[1].id.slice(-1)
             let fenInput = document.getElementById("fen")
             fenInput.value = perftFENs[index]
@@ -111,7 +111,7 @@ function inputHandler(event) {
                     break
                 }
             }
-            if(move == null) {
+            if (move == null) {
                 return false
             }
 
@@ -149,7 +149,7 @@ function inputHandler(event) {
     }
 }
 
-function markMove(start, end){
+function markMove(start, end) {
     window.board.removeMarkers(MARKER_TYPE.square)
     window.board.addMarker(MARKER_TYPE.square, start)
     window.board.addMarker(MARKER_TYPE.square, end)
