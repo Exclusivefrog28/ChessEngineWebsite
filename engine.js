@@ -13,7 +13,7 @@ if (typeof importScripts === "function") {
 
         switch (message.task) {
             case "search": {
-                let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [4]))
+                let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [5]))
                 let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
                 postMessage({task: message.task, fen: fen, start: move.start, end: move.end})
                 break;
@@ -33,8 +33,8 @@ if (typeof importScripts === "function") {
             }
 
             case "getMoves": {
-                let moves = JSON.parse(Module.ccall('getMoves', 'string', ['number'], [getSquareIndex(message.square)]))
-                postMessage({task: message.task, moves: moves})
+                let result = JSON.parse(Module.ccall('getMoves', 'string'))
+                postMessage({task: message.task, state: result.state, moves: result.moves})
                 break;
             }
 
@@ -56,7 +56,6 @@ if (typeof importScripts === "function") {
         }
     })
 }
-
 
 
 function getSquareIndex(square) {

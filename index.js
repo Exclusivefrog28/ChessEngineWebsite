@@ -42,7 +42,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 const engine = new Worker("engine.js")
 
-let moves
+let moves = []
+let whiteToMove = true
 
 engine.onmessage = function (e) {
     const message = e.data
@@ -52,22 +53,40 @@ engine.onmessage = function (e) {
             document.getElementById("engineLoading").style.visibility = "hidden"
             window.board.setPosition(message.fen, true)
             markMove(message.start, message.end)
+            whiteToMove = !whiteToMove
+            engine.postMessage({task: 'getMoves'})
             break
         case 'eval':
             console.log(message.score)
             break
         case 'move':
             window.board.setPosition(message.fen, true)
+            whiteToMove = !whiteToMove
+            engine.postMessage({task: 'getMoves'})
             break
         case 'getMoves':
-            moves = message.moves
-            for (let i = 0; i < moves.length; i++) {
-                window.board.addMarker(MARKER_TYPE.dot, moves[i].end)
+            switch (message.state) {
+                case 'normal':
+                    moves = message.moves
+                    break;
+                case 'checkmate':
+                    document.getElementById("winner").textContent = whiteToMove ? "Black won!" : "White won!"
+                    document.getElementById("winMethod").textContent = "by checkmate"
+                    document.getElementById("gameResults").style.display = ""
+                    break;
+                case 'stalemate':
+                    document.getElementById("winner").textContent = "It's a draw!"
+                    document.getElementById("winMethod").textContent = "by stalemate"
+                    document.getElementById("gameResults").style.display = ""
+                    break;
             }
             break
         case 'unMakeMove':
+            document.getElementById("gameResults").style.display = "none"
             window.board.setPosition(message.fen, true)
             window.board.removeMarkers(MARKER_TYPE.square)
+            whiteToMove = !whiteToMove
+            engine.postMessage({task: 'getMoves'})
             break
         case 'perft':
             log(`perft ${message.depth}: ${message.nodes} time: ${message.time}ms`)
@@ -89,6 +108,7 @@ engine.onmessage = function (e) {
 
                 engine.postMessage({task: 'perft', depth: depth, fen: fen})
             })
+            engine.postMessage({task: 'getMoves'})
             break
     }
 }
@@ -99,14 +119,18 @@ function inputHandler(event) {
 
     switch (event.type) {
         case INPUT_EVENT_TYPE.moveInputStarted:
-
-            engine.postMessage({task: 'getMoves', square: event.square})
+            for (let i = 0; i < moves.length; i++) {
+                if (moves[i].start === event.squareFrom) {
+                    window.board.addMarker(MARKER_TYPE.dot, moves[i].end)
+                }
+            }
 
             return true
         case INPUT_EVENT_TYPE.validateMoveInput:
             let move
             for (let i = 0; i < moves.length; i++) {
-                if (moves[i].end === event.squareTo) {
+                if (moves[i].start === event.squareFrom &&
+                    moves[i].end === event.squareTo) {
                     move = moves[i]
                     break
                 }
