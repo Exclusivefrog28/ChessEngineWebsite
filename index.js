@@ -8,7 +8,7 @@ import {COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js";
 window.board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
     assetsUrl: "../assets/",
-    style: {cssClass: "default", pieces: {file: "staunty.svg"}},
+    style: {pieces: {file: "staunty.svg"}},
     extensions: [{class: PromotionDialog}, {class: Markers}]
 })
 
@@ -28,15 +28,11 @@ perftFENs.forEach(fen => {
 })
 
 document.addEventListener('DOMContentLoaded', function () {
-    let elems = document.querySelectorAll('.carousel');
+    const carouselElement = document.getElementById("fenCarousel")
 
-    let instances = M.Carousel.init(elems, {
-        onCycleTo: function (item) {
-            let index = item.childNodes[1].id.slice(-1)
-            let fenInput = document.getElementById("fen")
-            fenInput.value = perftFENs[index]
-        }
-    });
+    carouselElement.addEventListener('slide.bs.carousel', (e) => {
+        document.getElementById("fen").value = perftFENs[e.to]
+    })
 
 });
 
@@ -72,12 +68,12 @@ engine.onmessage = function (e) {
                 case 'checkmate':
                     document.getElementById("winner").textContent = whiteToMove ? "Black won!" : "White won!"
                     document.getElementById("winMethod").textContent = "by checkmate"
-                    document.getElementById("gameResults").style.display = ""
+                    document.getElementById("gameResults").style.display = "block"
                     break;
                 case 'stalemate':
                     document.getElementById("winner").textContent = "It's a draw!"
                     document.getElementById("winMethod").textContent = "by stalemate"
-                    document.getElementById("gameResults").style.display = ""
+                    document.getElementById("gameResults").style.display = "block"
                     break;
             }
             break
@@ -89,8 +85,8 @@ engine.onmessage = function (e) {
             engine.postMessage({task: 'getMoves'})
             break
         case 'perft':
-            log(`perft ${message.depth}: ${message.nodes} time: ${message.time}ms`)
-            document.getElementById("perftLoading").style.display = "none"
+            log(`perft ${message.depth}: ${message.nodes.toLocaleString('fr-FR')} time: ${message.time}ms`)
+            document.getElementById("perftLoading").style.visibility = "hidden"
             break
         case 'ready':
             window.board.enableMoveInput(inputHandler)
@@ -102,11 +98,10 @@ engine.onmessage = function (e) {
                 engine.postMessage({task: 'unMakeMove'})
             })
             document.getElementById("perftButton").addEventListener("click", function () {
-                document.getElementById("perftLoading").style.display = ""
+                document.getElementById("perftLoading").style.visibility = "visible"
                 let depth = document.getElementById("depth").value
                 let fen = document.getElementById("fen").value
-
-                engine.postMessage({task: 'perft', depth: depth, fen: fen})
+                engine.postMessage({task: 'perft', depth: parseInt(depth), fen: fen})
             })
             engine.postMessage({task: 'getMoves'})
             break

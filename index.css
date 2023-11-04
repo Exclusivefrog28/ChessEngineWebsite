@@ -1,0 +1,8 @@
+#engineLoading, #perftLoading {
+    visibility: hidden;
+}
+
+#gameResults{
+    width: 20rem;
+    display: none;
+}
