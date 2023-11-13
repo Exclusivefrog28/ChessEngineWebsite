@@ -84,6 +84,10 @@ engine.onmessage = function (e) {
             whiteToMove = !whiteToMove
             engine.postMessage({task: 'getMoves'})
             break
+        case 'setBoardFen':
+            whiteToMove = message.sideToMove === 0
+            engine.postMessage({task: 'getMoves'})
+            break
         case 'perft':
             log(`perft ${message.depth}: ${message.nodes.toLocaleString('fr-FR')} time: ${message.time}ms`)
             document.getElementById("perftLoading").style.visibility = "hidden"
@@ -96,6 +100,12 @@ engine.onmessage = function (e) {
             })
             document.getElementById("unmake").addEventListener("click", function () {
                 engine.postMessage({task: 'unMakeMove'})
+            })
+            document.getElementById("setBoardFen").addEventListener("click", function () {
+                let fen = document.getElementById("boardFen").value
+                window.board.setPosition(fen, true)
+                window.board.removeMarkers(MARKER_TYPE.square)
+                engine.postMessage({task: 'setBoardFen', fen: fen})
             })
             document.getElementById("perftButton").addEventListener("click", function () {
                 document.getElementById("perftLoading").style.visibility = "visible"

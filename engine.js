@@ -44,6 +44,12 @@ if (typeof importScripts === "function") {
                 break;
             }
 
+            case "setBoardFen" : {
+                let sideToMove = Module.ccall('setFen', "int", ['string'],[message.fen])
+                postMessage({task: message.task, sideToMove: sideToMove})
+                break;
+            }
+
             case "perft": {
                 let start = new Date().getTime();
                 let fen = message.fen;
