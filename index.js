@@ -3,6 +3,7 @@ import {FEN} from "/src/cm-chessboard/model/Position.js"
 import {MARKER_TYPE, Markers} from "/src/cm-chessboard/extensions/markers/Markers.js"
 import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
 import {COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js";
+import {sigmoid} from "/src/util.js";
 
 
 window.board = new Chessboard(document.getElementById("board"), {
@@ -51,14 +52,20 @@ engine.onmessage = function (e) {
             markMove(message.start, message.end)
             whiteToMove = !whiteToMove
             engine.postMessage({task: 'getMoves'})
+            engine.postMessage({task: 'eval'})
             break
         case 'eval':
-            console.log(message.score)
+            let score = message.score
+            if (!whiteToMove) score *= -1
+            const evalBar = document.getElementById("eval")
+            evalBar.style.width = `${sigmoid(score / 100) * 100}%`
+            evalBar.innerHTML = score
             break
         case 'move':
             window.board.setPosition(message.fen, true)
             whiteToMove = !whiteToMove
             engine.postMessage({task: 'getMoves'})
+            engine.postMessage({task: 'eval'})
             break
         case 'getMoves':
             switch (message.state) {
@@ -83,10 +90,12 @@ engine.onmessage = function (e) {
             window.board.removeMarkers(MARKER_TYPE.square)
             whiteToMove = !whiteToMove
             engine.postMessage({task: 'getMoves'})
+            engine.postMessage({task: 'eval'})
             break
         case 'setBoardFen':
             whiteToMove = message.sideToMove === 0
             engine.postMessage({task: 'getMoves'})
+            engine.postMessage({task: 'eval'})
             break
         case 'perft':
             log(`perft ${message.depth}: ${message.nodes.toLocaleString('fr-FR')} time: ${message.time}ms`)
@@ -114,6 +123,7 @@ engine.onmessage = function (e) {
                 engine.postMessage({task: 'perft', depth: parseInt(depth), fen: fen})
             })
             engine.postMessage({task: 'getMoves'})
+            engine.postMessage({task: 'eval'})
             break
     }
 }

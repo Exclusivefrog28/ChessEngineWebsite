@@ -63,7 +63,6 @@ if (typeof importScripts === "function") {
     })
 }
 
-
 function getSquareIndex(square) {
     const file = square.charCodeAt(0) - 97;
     const rank = 8 - parseInt(square.charAt(1));
@@ -75,3 +74,5 @@ function getSquare(index) {
     const rank = 8 - Math.floor(index / 8);
     return file + rank;
 }
+
+

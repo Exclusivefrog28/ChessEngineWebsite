@@ -6,3 +6,15 @@
     width: 20rem;
     display: none;
 }
+
+.evalbar {
+    border-top-left-radius: 0!important;
+    border-top-right-radius: 0!important;
+    height: 1.33rem;
+    background-color: #4E4946;
+}
+
+.evalbar > .progress-bar {
+    background-color: #CCCCCC;
+    color: #4E4946;
+}
