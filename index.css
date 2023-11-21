@@ -1,3 +1,8 @@
+:root{
+    --black: #4E4946;
+    --white: #CCCCCC;
+}
+
 #engineLoading, #perftLoading {
     visibility: hidden;
 }
@@ -8,13 +13,22 @@
 }
 
 .evalbar {
-    border-top-left-radius: 0!important;
-    border-top-right-radius: 0!important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
     height: 1.33rem;
-    background-color: #4E4946;
+    background-color: var(--black);
+    position: relative;
 }
 
 .evalbar > .progress-bar {
-    background-color: #CCCCCC;
-    color: #4E4946;
+    background-color: var(--white);
+}
+
+#evalText {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    color: var(--black);
+    font-size: 1.1rem;
+    transition: all 0.6s ease;
 }

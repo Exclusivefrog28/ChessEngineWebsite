@@ -18,7 +18,8 @@
     <div class="row align-items-center justify-content-center">
         <div class="col-12 col-lg-7 px-0" id="board"></div>
         <div class="progress col-12 col-lg-7 px-0 evalbar" role="progressbar">
-            <div id="eval" class="progress-bar"></div>
+            <div id="evalBar" class="progress-bar"></div>
+            <p id="evalText"></p>
         </div>
         <div class="card position-absolute" id="gameResults">
             <div class="card-body">
@@ -71,7 +72,8 @@
             </div>
             <div class="w-75">
                 <label class="form-label" for="fen">FEN</label>
-                <input class="form-control" id="fen" type="text" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1">
+                <input class="form-control" id="fen" type="text"
+                       value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1">
             </div>
             <div class="w-75">
                 <label class="form-label" for="depth">Depth</label>
@@ -89,7 +91,8 @@
 </div>
 <script type="module" src="index.js"></script>
 <script type="module" src="engine.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
 </body>
 </html>

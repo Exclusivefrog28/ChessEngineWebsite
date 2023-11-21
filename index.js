@@ -5,7 +5,6 @@ import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/Pr
 import {COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js";
 import {sigmoid} from "/src/util.js";
 
-
 window.board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
     assetsUrl: "../assets/",
@@ -57,9 +56,14 @@ engine.onmessage = function (e) {
         case 'eval':
             let score = message.score
             if (!whiteToMove) score *= -1
-            const evalBar = document.getElementById("eval")
-            evalBar.style.width = `${sigmoid(score / 100) * 100}%`
-            evalBar.innerHTML = score
+            const blackAdvantage = score < 0
+            const evalBar = document.getElementById("evalBar")
+            const evalText = document.getElementById("evalText")
+            let whitePercentage = sigmoid(score / 100) * 100;
+            evalBar.style.width = `${whitePercentage}%`
+            evalText.style.left = `${blackAdvantage ? (whitePercentage + 100) / 2 : whitePercentage / 2}%`
+            evalText.style.color = blackAdvantage ? "var(--white)" : "var(--black)"
+            evalText.innerHTML = blackAdvantage ? -score : score
             break
         case 'move':
             window.board.setPosition(message.fen, true)
