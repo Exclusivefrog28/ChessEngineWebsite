@@ -13,7 +13,7 @@ if (typeof importScripts === "function") {
 
         switch (message.task) {
             case "search": {
-                let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [1]))
+                let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [2]))
                 let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
                 postMessage({task: message.task, fen: fen, start: move.start, end: move.end})
                 break;
