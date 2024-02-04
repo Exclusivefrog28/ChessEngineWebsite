@@ -1,13 +1,11 @@
-import {INPUT_EVENT_TYPE, Chessboard} from "/src/cm-chessboard/Chessboard.js"
-import {FEN} from "/src/cm-chessboard/model/Position.js"
+import {INPUT_EVENT_TYPE, Chessboard, FEN, COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js"
 import {MARKER_TYPE, Markers} from "/src/cm-chessboard/extensions/markers/Markers.js"
 import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
-import {COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js";
 import {sigmoid} from "/src/util.js";
 
 window.board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
-    assetsUrl: "../assets/",
+    assetsUrl: "src/cm-chessboard/assets/",
     style: {pieces: {file: "staunty.svg"}},
     extensions: [{class: PromotionDialog}, {class: Markers}]
 })
@@ -36,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-const engine = new Worker("engine.js")
+const engine = new Worker("./src/engine.js")
 
 let moves = []
 let whiteToMove = true
