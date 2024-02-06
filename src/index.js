@@ -3,38 +3,32 @@ import {MARKER_TYPE, Markers} from "/src/cm-chessboard/extensions/markers/Marker
 import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
 import {sigmoid} from "/src/util.js";
 
-window.board = new Chessboard(document.getElementById("board"), {
+const board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
     assetsUrl: "src/cm-chessboard/assets/",
     style: {pieces: {file: "staunty.svg"}},
     extensions: [{class: PromotionDialog}, {class: Markers}]
 })
 
-const perftFENs = [
-    FEN.start,
-    "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
-    "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
-    "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
-    "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8",
-]
-
-perftFENs.forEach(fen => {
-    new Chessboard(document.getElementById("perft" + (perftFENs.indexOf(fen))), {
-        position: fen,
-        extensions: [{class: Markers}]
-    })
-})
-
-document.addEventListener('DOMContentLoaded', function () {
-    const carouselElement = document.getElementById("fenCarousel")
-
-    carouselElement.addEventListener('slide.bs.carousel', (e) => {
-        document.getElementById("fen").value = perftFENs[e.to]
-    })
-
-});
-
 const engine = new Worker("./src/engine.js")
+
+const elements = {
+    engineLoading: document.getElementById("engineLoading"),
+    engineLoadingBar: document.getElementById("engineLoadingBar"),
+    gameResults: document.getElementById("gameResults"),
+    winner: document.getElementById("winner"),
+    winMethod: document.getElementById("winMethod"),
+    engineMoveBtn: document.getElementById("engineMoveBtn"),
+    unmakeMoveBtn: document.getElementById("unmakeMoveBtn"),
+    fenInput: document.getElementById("fenInput"),
+    fenBtn: document.getElementById("fenBtn"),
+    perftBtn: document.getElementById("perftBtn"),
+    depthLabel: document.getElementById("depthLabel"),
+    depthMeter: document.getElementById("depthMeter"),
+    ttLabel: document.getElementById("ttLabel"),
+    ttMeter: document.getElementById("ttMeter")
+}
+
 
 let moves = []
 let whiteToMove = true
@@ -44,8 +38,11 @@ engine.onmessage = function (e) {
 
     switch (message.task) {
         case 'search':
-            document.getElementById("engineLoading").style.visibility = "hidden"
-            window.board.setPosition(message.fen, true)
+            elements.engineLoading.style.visibility = "hidden"
+            elements.engineLoadingBar.style.visibility = "hidden"
+            elements.engineLoadingBar.style.transition = "none"
+            elements.engineLoadingBar.style.width = "0%"
+            board.setPosition(message.fen, true)
             markMove(message.start, message.end)
             whiteToMove = !whiteToMove
             engine.postMessage({task: 'getMoves'})
@@ -64,7 +61,7 @@ engine.onmessage = function (e) {
             evalText.innerHTML = blackAdvantage ? -score : score
             break
         case 'move':
-            window.board.setPosition(message.fen, true)
+            board.setPosition(message.fen, true)
             whiteToMove = !whiteToMove
             engine.postMessage({task: 'getMoves'})
             engine.postMessage({task: 'eval'})
@@ -75,21 +72,21 @@ engine.onmessage = function (e) {
                     moves = message.moves
                     break;
                 case 'checkmate':
-                    document.getElementById("winner").textContent = whiteToMove ? "Black won!" : "White won!"
-                    document.getElementById("winMethod").textContent = "by checkmate"
-                    document.getElementById("gameResults").style.display = "block"
+                    elements.winner.textContent = whiteToMove ? "Black won!" : "White won!"
+                    elements.winMethod.textContent = "by checkmate"
+                    elements.gameResults.style.display = "block"
                     break;
                 case 'stalemate':
-                    document.getElementById("winner").textContent = "It's a draw!"
-                    document.getElementById("winMethod").textContent = "by stalemate"
-                    document.getElementById("gameResults").style.display = "block"
+                    elements.winner.textContent = "It's a draw!"
+                    elements.winMethod.textContent = "by stalemate"
+                    elements.gameResults.style.display = "block"
                     break;
             }
             break
         case 'unMakeMove':
-            document.getElementById("gameResults").style.display = "none"
-            window.board.setPosition(message.fen, true)
-            window.board.removeMarkers(MARKER_TYPE.square)
+            elements.gameResults.style.display = "none"
+            board.setPosition(message.fen, true)
+            board.removeMarkers(MARKER_TYPE.square)
             whiteToMove = !whiteToMove
             engine.postMessage({task: 'getMoves'})
             engine.postMessage({task: 'eval'})
@@ -101,44 +98,52 @@ engine.onmessage = function (e) {
             break
         case 'perft':
             log(`perft ${message.depth}: ${message.nodes.toLocaleString('fr-FR')} time: ${message.time}ms`)
-            document.getElementById("perftLoading").style.visibility = "hidden"
             break
         case 'ready':
-            window.board.enableMoveInput(inputHandler)
-            document.getElementById("engineMove").addEventListener("click", () => {
-                document.getElementById("engineLoading").style.visibility = "visible"
+            board.enableMoveInput(inputHandler)
+            elements.engineMoveBtn.addEventListener("click", () => {
+                elements.engineLoading.style.visibility = "visible"
+                elements.engineLoadingBar.style.visibility = "visible"
+                elements.engineLoadingBar.style.transition = `all ${1}s ease-in`
+                setTimeout(() => elements.engineLoadingBar.style.width = "100%", 1)
+
                 engine.postMessage({task: 'search'})
             })
-            document.getElementById("unmake").addEventListener("click", function () {
+            elements.unmakeMoveBtn.addEventListener("click", function () {
                 engine.postMessage({task: 'unMakeMove'})
             })
-            document.getElementById("setBoardFen").addEventListener("click", function () {
-                let fen = document.getElementById("boardFen").value
-                window.board.setPosition(fen, true)
-                window.board.removeMarkers(MARKER_TYPE.square)
+            elements.fenBtn.addEventListener("click", function () {
+                const fen = elements.fenInput.value
+                board.setPosition(fen, true)
+                board.removeMarkers(MARKER_TYPE.square)
                 engine.postMessage({task: 'setBoardFen', fen: fen})
             })
-            document.getElementById("perftButton").addEventListener("click", function () {
-                document.getElementById("perftLoading").style.visibility = "visible"
-                let depth = document.getElementById("depth").value
-                let fen = document.getElementById("fen").value
-                engine.postMessage({task: 'perft', depth: parseInt(depth), fen: fen})
+            elements.perftBtn.addEventListener("click", function () {
+                let depth = '7'
+                engine.postMessage({task: 'perft', depth: parseInt(depth), fen: board.getPosition()})
             })
             engine.postMessage({task: 'getMoves'})
             engine.postMessage({task: 'eval'})
             break
+        case 'updateMeters':
+            elements.depthLabel.innerText = message.depth
+            elements.depthMeter.setAttribute('stroke-dashoffset', ((Math.min(message.depth, 20) - 20) * (-245 / 20)).toFixed(2))
+            const ttPercent = parseInt(message.tt) / (1 << 23)
+            elements.ttLabel.innerText = `${(ttPercent * 100).toFixed(0)} %`
+            elements.ttMeter.setAttribute('stroke-dashoffset', ((ttPercent - 1) * (-245)).toFixed(2))
+
     }
 }
 
 function inputHandler(event) {
-    window.board.removeMarkers(MARKER_TYPE.frame)
-    window.board.removeMarkers(MARKER_TYPE.dot)
+    board.removeMarkers(MARKER_TYPE.frame)
+    board.removeMarkers(MARKER_TYPE.dot)
 
     switch (event.type) {
         case INPUT_EVENT_TYPE.moveInputStarted:
             for (let i = 0; i < moves.length; i++) {
                 if (moves[i].start === event.squareFrom) {
-                    window.board.addMarker(MARKER_TYPE.dot, moves[i].end)
+                    board.addMarker(MARKER_TYPE.dot, moves[i].end)
                 }
             }
 
@@ -159,7 +164,7 @@ function inputHandler(event) {
             markMove(event.squareFrom, event.squareTo)
 
             if (move.promotionType != 0) {
-                window.board.showPromotionDialog(event.squareTo, (move.player == 0) ? COLOR.white : COLOR.black, (result) => {
+                board.showPromotionDialog(event.squareTo, (move.player == 0) ? COLOR.white : COLOR.black, (result) => {
                     switch (result.piece) {
                         case PIECE.wn:
                         case PIECE.bn:
@@ -191,9 +196,9 @@ function inputHandler(event) {
 }
 
 function markMove(start, end) {
-    window.board.removeMarkers(MARKER_TYPE.square)
-    window.board.addMarker(MARKER_TYPE.square, start)
-    window.board.addMarker(MARKER_TYPE.square, end)
+    board.removeMarkers(MARKER_TYPE.square)
+    board.addMarker(MARKER_TYPE.square, start)
+    board.addMarker(MARKER_TYPE.square, end)
 }
 
 const output = document.getElementById("output")
