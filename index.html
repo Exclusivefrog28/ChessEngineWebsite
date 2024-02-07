@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="src/cm-chessboard/assets/extensions/markers/markers.css"/>
     <link rel="stylesheet" href="src/cm-chessboard/assets/extensions/promotion-dialog/promotion-dialog.css"/>
 
-    <script src="src/enable-threads.js"></script>
+    <script src="enable-threads.js"></script>
 </head>
 <body class="background">
 <div class="md:container md:mx-auto lg:mt-8 mb-6">
@@ -47,16 +47,20 @@
                         </div>
                         <div class="flex w-full items-center justify-between">
                             <button id="unmakeMoveBtn"
-                                    class="rounded-full py-3 px-5 text-gray-100 font-medium
+                                    class="rounded-full py-3 px-5 text-gray-100
                                    neumorphic neumorphic-btn transition-all
-                                   flex gap-2 items-center">
+                                   flex gap-2 items-center
+                                   font-normal text-sm
+                                   md:font-medium md:text-lg">
                                 unmake move
                                 <span class="material-symbols-rounded">undo</span>
                             </button>
                             <button id="engineMoveBtn"
-                                    class="rounded-full py-3 px-5 text-gray-100 font-medium
+                                    class="rounded-full py-3 px-5 text-gray-100
                                    neumorphic neumorphic-btn transition-all
-                                   flex gap-2 items-center">
+                                   flex gap-2 items-center
+                                   font-normal text-sm
+                                   md:font-medium md:text-lg">
                                 make engine move
                                 <span class="material-symbols-rounded">memory</span>
                             </button>
