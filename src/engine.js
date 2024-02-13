@@ -1,67 +1,43 @@
-if (typeof importScripts === "function") {
-    importScripts('ChessEngine.js')
+import {Manager} from "https://cdn.jsdelivr.net/gh//Exclusivefrog28/organized-workers/src/organized-workers.js";
+import Engine from "./ChessEngine.js"
 
-    Module.onRuntimeInitialized = function () {
-        console.log('Module initialized')
-        Module.ccall("init")
+const manager = new Manager();
+const engine = Engine();
 
-        postMessage({task: 'ready'})
-    }
-    self.addEventListener('message', function (e) {
+Engine().then(function(engine) {
+    console.log('Module initialized');
+    engine.ccall("init");
+    manager.call('ready');
 
-        const message = e.data;
-
-        switch (message.task) {
-            case "search": {
-                let move = JSON.parse(Module.ccall("getBestMove", 'string', ['number'], [1000]))
-                let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
-                postMessage({task: message.task, fen: fen, start: move.start, end: move.end})
-                break;
-            }
-
-            case "eval": {
-                let score = Module.ccall('eval', 'int')
-                postMessage({task: message.task, score: score})
-                break;
-            }
-
-            case "move": {
-                let move = message.move;
-                let fen = Module.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
-                postMessage({task: message.task, fen: fen})
-                break;
-            }
-
-            case "getMoves": {
-                let result = JSON.parse(Module.ccall('getMoves', 'string'))
-                postMessage({task: message.task, state: result.state, moves: result.moves})
-                break;
-            }
-
-            case "unMakeMove": {
-                let fen = Module.ccall("unmove", 'string')
-                postMessage({task: message.task, fen: fen})
-                break;
-            }
-
-            case "setBoardFen" : {
-                let sideToMove = Module.ccall('setFen', "int", ['string'],[message.fen])
-                postMessage({task: message.task, sideToMove: sideToMove})
-                break;
-            }
-
-            case "perft": {
-                let start = new Date().getTime();
-                let fen = message.fen;
-                let depth = message.depth;
-                let nodes = Module.ccall("runPerft", 'number', ['number', 'string'], [depth, fen])
-                let end = new Date().getTime();
-                postMessage({task: message.task, depth: depth, nodes: nodes, time: end - start})
-                break;
-            }
-        }
-    })
-}
+    manager
+        .register('search', () => {
+            let move = JSON.parse(engine.ccall("getBestMove", 'string', ['number'], [1000]))
+            let fen = engine.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
+            return {fen: fen, start: move.start, end: move.end}
+        })
+        .register('eval', () => {
+            return engine.ccall('eval', 'int')
+        })
+        .register('move', (move) => {
+            return engine.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player])
+        })
+        .register('getMoves', () => {
+            const result = JSON.parse(engine.ccall('getMoves', 'string'))
+            return {state: result.state, moves: result.moves}
+        })
+        .register('unMakeMove', () => {
+            return engine.ccall("unmove", 'string')
+        })
+        .register('setBoardFen', (fen) => {
+            return engine.ccall("setFen", "int", ['string'], [fen])
+        })
+        .register('perft', (fen, depth) => {
+            const start = new Date().getTime();
+            const nodes = engine.ccall("runPerft", 'number', ['number', 'string'], [depth, fen])
+            const end = new Date().getTime();
+            return {depth: depth, nodes: nodes, time: end - start}
+        })
+})
 
 function getSquareIndex(square) {
     const file = square.charCodeAt(0) - 97;

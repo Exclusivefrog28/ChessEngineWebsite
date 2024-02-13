@@ -10,8 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 
-    <link rel="stylesheet" href="src/output.css">
-    <link rel="stylesheet" href="src/index.css">
+    <link rel="stylesheet" href="src/styles.css">
 
     <link rel="stylesheet" href="src/cm-chessboard/assets/chessboard.css"/>
     <link rel="stylesheet" href="src/cm-chessboard/assets/extensions/markers/markers.css"/>
@@ -48,19 +47,17 @@
                         <div class="flex w-full items-center justify-between">
                             <button id="unmakeMoveBtn"
                                     class="rounded-full py-3 px-5 text-gray-100
-                                   neumorphic neumorphic-btn transition-all
-                                   flex gap-2 items-center
-                                   font-normal text-sm
-                                   md:font-medium md:text-lg">
+                                    neumorphic neumorphic-btn transition-all
+                                    flex gap-2 items-center
+                                    text-sm md:text-base">
                                 unmake move
                                 <span class="material-symbols-rounded">undo</span>
                             </button>
                             <button id="engineMoveBtn"
                                     class="rounded-full py-3 px-5 text-gray-100
-                                   neumorphic neumorphic-btn transition-all
-                                   flex gap-2 items-center
-                                   font-normal text-sm
-                                   md:font-medium md:text-lg">
+                                    neumorphic neumorphic-btn transition-all
+                                    flex gap-2 items-center
+                                    text-sm md:text-base">
                                 make engine move
                                 <span class="material-symbols-rounded">memory</span>
                             </button>
@@ -71,9 +68,10 @@
                               neumorphic-input outline-0"
                                id="fenInput" placeholder="FEN" type="text">
                         <button id="fenBtn"
-                                class="rounded-full py-3 px-5 text-gray-100 font-medium
+                                class="rounded-full py-3 px-5 text-gray-100
                                    neumorphic neumorphic-btn transition-all
-                                   flex gap-2 items-center">
+                                   flex gap-2 items-center
+                                   text-sm md:text-base">
                             set position
                             <span class="material-symbols-rounded">edit_square</span>
                         </button>
@@ -112,7 +110,6 @@
         Run perft
     </button>
 </div>
-<script type="module" src="src/index.js"></script>
-<script type="module" src="src/engine.js"></script>
+<script type="module" src="src/app.js"></script>
 </body>
 </html>
