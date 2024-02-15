@@ -1,5 +1,5 @@
-import OrganizedWorker from "https://cdn.jsdelivr.net/gh//Exclusivefrog28/organized-workers/src/organized-workers.js";
-import {INPUT_EVENT_TYPE, Chessboard, FEN, COLOR, PIECE} from "/src/cm-chessboard/Chessboard.js"
+import OrganizedWorker from "./organized-workers.js";
+import {Chessboard, COLOR, FEN, INPUT_EVENT_TYPE, PIECE} from "/src/cm-chessboard/Chessboard.js"
 import {MARKER_TYPE, Markers} from "/src/cm-chessboard/extensions/markers/Markers.js"
 import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
 import {sigmoid} from "/src/util.js";
@@ -78,10 +78,12 @@ engine
             //TODO
         })
     })
-    .register('updateMeters', (values) => {
-        elements.depthLabel.innerText = values.depth
-        elements.depthMeter.setAttribute('stroke-dashoffset', ((Math.min(values.depth, 20) - 20) * (-245 / 20)).toFixed(2))
-        const ttPercent = parseInt(values.tt) / (1 << 23)
+    .register('updateDepth', (depth) => {
+        elements.depthLabel.innerText = depth
+        elements.depthMeter.setAttribute('stroke-dashoffset', ((Math.min(depth, 20) - 20) * (-245 / 20)).toFixed(2))
+    })
+    .register('updateTTOccupancy', (tt) => {
+        const ttPercent = parseInt(tt) / (1 << 23)
         elements.ttLabel.innerText = `${(ttPercent * 100).toFixed(0)} %`
         elements.ttMeter.setAttribute('stroke-dashoffset', ((ttPercent - 1) * (-245)).toFixed(2))
     })

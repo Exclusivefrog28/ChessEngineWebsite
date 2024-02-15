@@ -1,8 +1,7 @@
-import {Manager} from "https://cdn.jsdelivr.net/gh//Exclusivefrog28/organized-workers/src/organized-workers.js";
+import {Manager} from "./organized-workers.js";
 import Engine from "./ChessEngine.js"
 
 const manager = new Manager();
-const engine = Engine();
 
 Engine().then(function(engine) {
     console.log('Module initialized');
