@@ -26,7 +26,9 @@ const elements = {
     depthLabel: document.getElementById("depthLabel"),
     depthMeter: document.getElementById("depthMeter"),
     ttLabel: document.getElementById("ttLabel"),
-    ttMeter: document.getElementById("ttMeter")
+    ttMeter: document.getElementById("ttMeter"),
+    pvDiv: document.getElementById("pvDiv"),
+    pvList: document.getElementById("pvList"),
 }
 
 let moves = []
@@ -80,12 +82,23 @@ engine
     })
     .register('updateDepth', (depth) => {
         elements.depthLabel.innerText = depth
-        elements.depthMeter.setAttribute('stroke-dashoffset', ((Math.min(depth, 20) - 20) * (-245 / 20)).toFixed(2))
+        elements.depthMeter.setAttribute('stroke-dashoffset', ((Math.min(depth, 20) - 20) * (-209 / 20) + 36).toFixed(2))
     })
     .register('updateTTOccupancy', (tt) => {
+        console.log(tt)
         const ttPercent = parseInt(tt) / (1 << 23)
         elements.ttLabel.innerText = `${(ttPercent * 100).toFixed(0)} %`
-        elements.ttMeter.setAttribute('stroke-dashoffset', ((ttPercent - 1) * (-245)).toFixed(2))
+        elements.ttMeter.setAttribute('stroke-dashoffset', ((ttPercent - 1) * (-209) + 36).toFixed(2))
+    })
+    .register('updatePV', (pv) => {
+        elements.pvDiv.style.display = "block";
+        const pvMoves = pv.split(" ");
+        elements.pvList.innerHTML = "";
+        pvMoves.forEach((move) => {
+            const li = document.createElement("li");
+            li.innerText = move;
+            elements.pvList.appendChild(li);
+        })
     })
 
 const updateEval = async () => {

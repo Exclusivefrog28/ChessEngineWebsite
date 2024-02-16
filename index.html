@@ -19,12 +19,12 @@
     <script src="enable-threads.js"></script>
 </head>
 <body class="background">
-<div class="md:container md:mx-auto lg:mt-8 mb-6">
+<div class="md:container mx-auto lg:mt-8 mb-6">
     <div class="grid grid-cols-12">
         <div class="lg:col-span-6 lg:col-start-0 md:col-span-10 md:col-start-2 col-span-12 relative
-                    neumorphic-shadow rounded-lg overflow-hidden">
-            <div id="board"></div>
-            <div class="evalbar" role="progressbar">
+                    neumorphic-shadow fit-on-screen aspect-square sm:mx-auto md:mx-0">
+            <div id="board" class="rounded-t-xl overflow-hidden"></div>
+            <div class="evalbar rounded-b-xl overflow-hidden" role="progressbar">
                 <div id="evalBar" class="progress-bar"></div>
                 <p id="evalText"></p>
             </div>
@@ -77,10 +77,20 @@
                         </button>
                     </div>
                 </div>
+                <div id="pvDiv" class="w-4/5 mx-auto space-y-2 hidden">
+                    <h4>Principal Variation:</h4>
+                    <ul id="pvList" class="flex flex-wrap gap-4">
+                        <li>d7d5</li>
+                        <li>h2h3</li>
+                        <li>b8c6</li>
+                        <li>g1f3</li>
+                        <li>g8f6</li>
+                    </ul>
+                </div>
                 <div class="flex justify-around">
                     <div class="w-1/4 relative meter">
                         <div class="force-center text-gray-300 text-center">
-                            <span id="depthLabel" class="text-2xl font-bold">0</span><br/>
+                            <span id="depthLabel" class="lg:text-2xl font-bold">0</span><br/>
                             <span>depth</span>
                         </div>
                         <svg class="circles" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
@@ -89,9 +99,12 @@
                                     stroke-linecap="round" class="long-transition"></circle>
                         </svg>
                     </div>
+                    <div>
+
+                    </div>
                     <div class="w-1/4 relative meter">
                         <div class="force-center text-gray-300 text-center">
-                            <span id="ttLabel" class="text-2xl font-bold">0%</span><br/>
+                            <span id="ttLabel" class="xl:text-2xl font-bold">0%</span><br/>
                             <span>TT fill</span>
                         </div>
                         <svg class="circles" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">

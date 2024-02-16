@@ -32,7 +32,6 @@ function OrganizedWorker(workerPath) {
     }
 
     worker.onmessage = (e) => {
-        console.log(e.data)
         if (e.data.name in reports) {
             reports[e.data.name](...e.data.data);
         } else {
