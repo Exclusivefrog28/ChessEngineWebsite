@@ -29,6 +29,7 @@ const elements = {
     ttMeter: document.getElementById("ttMeter"),
     pvDiv: document.getElementById("pvDiv"),
     pvList: document.getElementById("pvList"),
+    log: document.getElementById("log")
 }
 
 let moves = []
@@ -53,27 +54,20 @@ engine
             elements.engineLoadingBar.style.width = "0%";
             board.setPosition(result.fen, true);
             markMove(result.start, result.end);
-            whiteToMove = !whiteToMove;
-            updateMoves();
-            updateEval();
+            handleTurn(true, false);
         })
         elements.unmakeMoveBtn.addEventListener("click", async () => {
             const fen = await engine.call('unMakeMove');
             elements.gameResults.style.display = "none";
             board.setPosition(fen, true);
-            board.removeMarkers(MARKER_TYPE.square);
-            whiteToMove = !whiteToMove;
-            updateMoves();
-            updateEval();
+            handleTurn();
         })
         elements.fenBtn.addEventListener("click", async () => {
             const fen = elements.fenInput.value;
             board.setPosition(fen, true);
-            board.removeMarkers(MARKER_TYPE.square);
             const sideToMove = await engine.call('setBoardFen', fen);
             whiteToMove = sideToMove === 0;
-            updateMoves();
-            updateEval();
+            handleTurn(false, true);
 
         })
         elements.perftBtn.addEventListener("click", async () => {
@@ -85,7 +79,6 @@ engine
         elements.depthMeter.setAttribute('stroke-dashoffset', ((Math.min(depth, 20) - 20) * (-209 / 20) + 36).toFixed(2))
     })
     .register('updateTTOccupancy', (tt) => {
-        console.log(tt)
         const ttPercent = parseInt(tt) / (1 << 23)
         elements.ttLabel.innerText = `${(ttPercent * 100).toFixed(0)} %`
         elements.ttMeter.setAttribute('stroke-dashoffset', ((ttPercent - 1) * (-209) + 36).toFixed(2))
@@ -100,6 +93,42 @@ engine
             elements.pvList.appendChild(li);
         })
     })
+    .register('log', (msg) => {
+        console.log(msg);
+        const msgParts = msg.split(' ');
+        const type = msgParts[0];
+        const name = msgParts[1];
+        const args = msgParts.slice(2).join(' ');
+
+        const li = document.createElement("li");
+        const p =  document.createElement("p");
+        const h4 = document.createElement("h4");
+        const span1 = document.createElement("span");
+        const span2 = document.createElement("span");
+
+        li.className = 'flex flex-row flex-nowrap gap-2';
+        span1.innerText = type;
+        span2.innerText = name;
+        if (type === 'info') span1.className='text-yellow-500';
+        h4.appendChild(span1);
+        h4.appendChild(span2);
+        h4.className = 'flex flex-row flex-nowrap gap-2';
+        li.appendChild(h4);
+        p.innerText = args;
+        p.className = 'text-nowrap';
+        li.appendChild(p);
+        elements.log.appendChild(li);
+    })
+
+const handleTurn = (switchPlayer = true, clearPV = true) => {
+    board.removeMarkers(MARKER_TYPE.square);
+    board.removeMarkers(MARKER_TYPE.frame);
+    updateMoves();
+    updateEval();
+    whiteToMove = !whiteToMove;
+    if (clearPV) elements.pvDiv.style.display = "none";
+}
+
 
 const updateEval = async () => {
     let score = await engine.call('eval');
@@ -136,9 +165,7 @@ const updateMoves = async () => {
 const makeMove = async (move) => {
     const fen = await engine.call('move', move);
     board.setPosition(fen, true);
-    whiteToMove = !whiteToMove;
-    updateMoves();
-    updateEval();
+    handleTurn();
 }
 
 function inputHandler(event) {
@@ -169,35 +196,35 @@ function inputHandler(event) {
 
             markMove(event.squareFrom, event.squareTo)
 
-            if (move.promotionType != 0) {
-                board.showPromotionDialog(event.squareTo, (move.player == 0) ? COLOR.white : COLOR.black, (result) => {
+            if (move.promotionType !== "0") {
+                board.showPromotionDialog(event.squareTo, (move.player === "0") ? COLOR.white : COLOR.black, (result) => {
                     switch (result.piece) {
                         case PIECE.wn:
                         case PIECE.bn:
-                            move.promotionType = 2
-                            break
+                            move.promotionType = 2;
+                            break;
                         case PIECE.wb:
                         case PIECE.bb:
-                            move.promotionType = 3
-                            break
+                            move.promotionType = 3;
+                            break;
                         case PIECE.wr:
                         case PIECE.br:
-                            move.promotionType = 4
-                            break
+                            move.promotionType = 4;
+                            break;
                         case PIECE.wq:
                         case PIECE.bq:
-                            move.promotionType = 5
-                            break
+                            move.promotionType = 5;
+                            break;
                     }
-                    makeMove(move)
+                    makeMove(move);
                 })
             } else {
-                makeMove(move)
-                break
+                makeMove(move);
+                break;
             }
             return true
         case INPUT_EVENT_TYPE.moveInputCanceled:
-            break
+            break;
     }
 }
 
