@@ -10,6 +10,10 @@ const board = new Chessboard(document.getElementById("board"), {
     style: {pieces: {file: "staunty.svg"}},
     extensions: [{class: PromotionDialog}, {class: Markers}]
 })
+document.getElementById("flip").addEventListener("click", () =>
+    board.setOrientation(board.getOrientation() === COLOR.white ? COLOR.black : COLOR.white, true)
+)
+
 const engine = new OrganizedWorker("./src/engine.js")
 
 const elements = {

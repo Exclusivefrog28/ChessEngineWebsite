@@ -24,6 +24,9 @@
         <div class="lg:col-span-6 lg:col-start-0 md:col-span-10 md:col-start-2 col-span-12 relative
                     neumorphic-shadow lg:max-h-[calc(100vh-4rem-1.33rem)] lg:aspect-square sm:mx-auto md:mx-0">
             <div id="board" class="sm:rounded-t-xl overflow-hidden"></div>
+            <button id="flip" class="absolute right-0 top-1/2 -translate-y-1/2 background hover:text-gray-300 flex items-center justify-center rounded-l-lg p-1 pr-0">
+                <span class="material-symbols-rounded">screen_rotation_up</span>
+            </button>
             <div class="evalbar rounded-b-xl overflow-hidden" role="progressbar">
                 <div id="evalBar" class="progress-bar"></div>
                 <p id="evalText"></p>
@@ -47,19 +50,19 @@
                         </div>
                         <div class="flex w-full items-center justify-between">
                             <button id="unmakeMoveBtn"
-                                    class="rounded-full p-2 sm:py-3 sm:px-4 text-gray-100
+                                    class="rounded-full py-2 px-4 sm:py-3 text-gray-100
                                     neumorphic neumorphic-btn transition-all
                                     flex gap-2 items-center
                                     text-sm md:text-base">
-                                unmake move
+                                takeback
                                 <span class="material-symbols-rounded">undo</span>
                             </button>
                             <button id="engineMoveBtn"
-                                    class="rounded-full p-2 sm:py-3 sm:px-4 text-gray-100
+                                    class="rounded-full py-2 px-4 sm:py-3 text-gray-100
                                     neumorphic neumorphic-btn transition-all
                                     flex gap-2 items-center
                                     text-sm md:text-base">
-                                make engine move
+                                engine move
                                 <span class="material-symbols-rounded">memory</span>
                             </button>
                         </div>
@@ -69,11 +72,11 @@
                               neumorphic-input outline-0"
                                id="fenInput" placeholder="FEN" type="text">
                         <button id="fenBtn"
-                                class="rounded-full p-2 sm:py-3 sm:px-5 text-gray-100
+                                class="rounded-full p-2 sm:py-3 sm:px-4 text-gray-100
                                    neumorphic neumorphic-btn transition-all
                                    flex gap-2 items-center
                                    text-sm md:text-base">
-                            set position
+                            set pos
                             <span class="material-symbols-rounded">edit_square</span>
                         </button>
                     </div>
