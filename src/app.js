@@ -33,7 +33,9 @@ const elements = {
     ttMeter: document.getElementById("ttMeter"),
     pvDiv: document.getElementById("pvDiv"),
     pvList: document.getElementById("pvList"),
-    log: document.getElementById("log")
+    log: document.getElementById("log"),
+    autoWhite : document.getElementById("autoWhite"),
+    autoBlack : document.getElementById("autoBlack"),
 }
 
 let moves = []
@@ -45,29 +47,20 @@ engine
         updateEval();
         board.enableMoveInput(inputHandler)
         elements.engineMoveBtn.addEventListener("click", async () => {
-            elements.engineLoading.style.visibility = "visible";
-            elements.engineLoadingBar.style.visibility = "visible";
-            elements.engineLoadingBar.style.transition = `all ${1}s ease-in`;
-            setTimeout(() => elements.engineLoadingBar.style.width = "100%", 1);
-
-            const result = await engine.call('search');
-
-            elements.engineLoading.style.visibility = "hidden";
-            elements.engineLoadingBar.style.visibility = "hidden";
-            elements.engineLoadingBar.style.transition = "none";
-            elements.engineLoadingBar.style.width = "0%";
-            board.setPosition(result.fen, true);
-            markMove(result.start, result.end);
-            handleTurn(true, false);
+            playEngineMove();
         })
         elements.unmakeMoveBtn.addEventListener("click", async () => {
             const fen = await engine.call('unMakeMove');
             elements.gameResults.style.display = "none";
+            elements.autoWhite.checked = false;
+            elements.autoBlack.checked = false;
             board.setPosition(fen, true);
             handleTurn();
         })
         elements.fenBtn.addEventListener("click", async () => {
             const fen = elements.fenInput.value;
+            elements.autoWhite.checked = false;
+            elements.autoBlack.checked = false;
             board.setPosition(fen, true);
             const sideToMove = await engine.call('setBoardFen', fen);
             whiteToMove = sideToMove === 0;
@@ -76,6 +69,12 @@ engine
         })
         elements.perftBtn.addEventListener("click", async () => {
             //TODO
+        })
+        elements.autoWhite.addEventListener("change", async (e) => {
+            if (e.target.checked && whiteToMove) playEngineMove()
+        })
+        elements.autoBlack.addEventListener("change", async (e) => {
+            if (e.target.checked && !whiteToMove) playEngineMove()
         })
     })
     .register('updateDepth', (depth) => {
@@ -129,8 +128,33 @@ const handleTurn = (switchPlayer = true, clearPV = true) => {
     board.removeMarkers(MARKER_TYPE.frame);
     updateMoves();
     updateEval();
-    whiteToMove = !whiteToMove;
+    if (switchPlayer) whiteToMove = !whiteToMove;
     if (clearPV) elements.pvDiv.style.display = "none";
+    if ((whiteToMove && elements.autoWhite.checked )|| (!whiteToMove && elements.autoBlack.checked)) {
+        playEngineMove()
+    }
+}
+
+const playEngineMove = async ()=>{
+    elements.engineLoading.style.visibility = "visible";
+    elements.engineLoadingBar.style.visibility = "visible";
+    elements.engineLoadingBar.style.width = "0%";
+    let width = 0;
+    let interval = setInterval(()=>{
+        width += 1;
+        elements.engineLoadingBar.style.width = `${width}%`
+        if (width >= 100) clearInterval(interval);
+    }, 10);
+
+
+    const result = await engine.call('search');
+
+    clearInterval(interval);
+    elements.engineLoading.style.visibility = "hidden";
+    elements.engineLoadingBar.style.visibility = "hidden";
+    board.setPosition(result.fen, true);
+    markMove(result.start, result.end);
+    handleTurn(true, false);
 }
 
 

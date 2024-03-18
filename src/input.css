@@ -67,6 +67,16 @@
     box-shadow: -5px -5px 20px #212121, 5px 5px 20px #141414;
 }
 
+.neumorphic-checkbox > i {
+    background-color: var(--background);
+    box-shadow: -1px -1px 3px #212121, 1px 1px 3px #141414;
+}
+
+.neumorphic-checkbox input:checked ~ i {
+    color: white;
+    box-shadow: inset 1px 1px 2px #141414, inset -1px -1px 2px #212121;
+}
+
 .neumorphic-btn:hover {
     box-shadow: -2px -2px 5px #212121, 2px 2px 5px #141414;
 }
