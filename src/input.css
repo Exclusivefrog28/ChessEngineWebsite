@@ -149,3 +149,11 @@
 .long-transition {
     transition: all 0.67s ease;
 }
+
+.tooltip {
+    @apply opacity-0 absolute transition-all scale-x-0 origin-right;
+}
+
+.has-tooltip:hover .tooltip {
+    @apply opacity-100 z-50 scale-x-100
+}

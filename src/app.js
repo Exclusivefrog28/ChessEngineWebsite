@@ -3,13 +3,15 @@ import {Chessboard, COLOR, FEN, INPUT_EVENT_TYPE, PIECE} from "/src/cm-chessboar
 import {MARKER_TYPE, Markers} from "/src/cm-chessboard/extensions/markers/Markers.js"
 import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
 import {sigmoid} from "/src/util.js";
+import {ARROW_TYPE, Arrows} from "/src/cm-chessboard/extensions/arrows/Arrows.js";
 
 const board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
-    assetsUrl: "src/cm-chessboard/assets/",
+    assetsUrl: "./src/cm-chessboard/assets/",
     style: {pieces: {file: "staunty.svg"}},
-    extensions: [{class: PromotionDialog}, {class: Markers}]
+    extensions: [{class: PromotionDialog}, {class: Markers}, {class: Arrows}]
 })
+
 document.getElementById("flip").addEventListener("click", () =>
     board.setOrientation(board.getOrientation() === COLOR.white ? COLOR.black : COLOR.white, true)
 )
@@ -34,8 +36,8 @@ const elements = {
     pvDiv: document.getElementById("pvDiv"),
     pvList: document.getElementById("pvList"),
     log: document.getElementById("log"),
-    autoWhite : document.getElementById("autoWhite"),
-    autoBlack : document.getElementById("autoBlack"),
+    autoWhite: document.getElementById("autoWhite"),
+    autoBlack: document.getElementById("autoBlack"),
 }
 
 let moves = []
@@ -95,16 +97,31 @@ engine
             li.innerText = move;
             elements.pvList.appendChild(li);
         })
+        elements.pvList.children[1].style.cursor = "pointer";
+        elements.pvList.children[1].addEventListener("mouseover", ()=>{
+            const secondmove = pvMoves[1];
+            const from = secondmove.substring(0, 2);
+            const to = secondmove.substring(2, 4);
+            board.addArrow(ARROW_TYPE.default, from, to);
+        })
+        elements.pvList.children[1].addEventListener("mouseout", ()=>{
+            board.removeArrows(ARROW_TYPE.default);
+        })
+    })
+    .register('moveStart', (move) => {
+        board.addArrow(ARROW_TYPE.default, move.substring(0, 2), move.substring(2, 4))
+    })
+    .register('moveEnd', (move) => {
+        board.removeArrows(ARROW_TYPE.default, move.substring(0, 2), move.substring(2, 4))
     })
     .register('log', (msg) => {
-        console.log(msg);
         const msgParts = msg.split(' ');
         const type = msgParts[0];
         const name = msgParts[1];
         const args = msgParts.slice(2).join(' ');
 
         const li = document.createElement("li");
-        const p =  document.createElement("p");
+        const p = document.createElement("p");
         const h4 = document.createElement("h4");
         const span1 = document.createElement("span");
         const span2 = document.createElement("span");
@@ -112,7 +129,7 @@ engine
         li.className = 'flex flex-row flex-nowrap gap-2';
         span1.innerText = type;
         span2.innerText = name;
-        if (type === 'info') span1.className='text-yellow-500';
+        if (type === 'info') span1.className = 'text-yellow-500';
         h4.appendChild(span1);
         h4.appendChild(span2);
         h4.className = 'flex flex-row flex-nowrap gap-2';
@@ -130,17 +147,17 @@ const handleTurn = (switchPlayer = true, clearPV = true) => {
     updateEval();
     if (switchPlayer) whiteToMove = !whiteToMove;
     if (clearPV) elements.pvDiv.style.display = "none";
-    if ((whiteToMove && elements.autoWhite.checked )|| (!whiteToMove && elements.autoBlack.checked)) {
+    if ((whiteToMove && elements.autoWhite.checked) || (!whiteToMove && elements.autoBlack.checked)) {
         playEngineMove()
     }
 }
 
-const playEngineMove = async ()=>{
+const playEngineMove = async () => {
     elements.engineLoading.style.visibility = "visible";
     elements.engineLoadingBar.style.visibility = "visible";
     elements.engineLoadingBar.style.width = "0%";
     let width = 0;
-    let interval = setInterval(()=>{
+    let interval = setInterval(() => {
         width += 1;
         elements.engineLoadingBar.style.width = `${width}%`
         if (width >= 100) clearInterval(interval);

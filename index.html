@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="src/cm-chessboard/assets/chessboard.css"/>
     <link rel="stylesheet" href="src/cm-chessboard/assets/extensions/markers/markers.css"/>
     <link rel="stylesheet" href="src/cm-chessboard/assets/extensions/promotion-dialog/promotion-dialog.css"/>
+    <link rel="stylesheet" href="src/assets/arrows.css">
 
     <script src="enable-threads.js"></script>
 </head>
@@ -24,8 +25,10 @@
         <div class="lg:col-span-6 lg:col-start-0 md:col-span-10 md:col-start-2 col-span-12 relative
                     neumorphic-shadow lg:max-h-[calc(100vh-4rem-1.33rem)] lg:aspect-square sm:mx-auto md:mx-0">
             <div id="board" class="sm:rounded-t-xl overflow-hidden"></div>
-            <button id="flip" class="absolute right-0 top-1/2 -translate-y-1/2 background hover:text-gray-300 flex items-center justify-center rounded-l-lg p-1 pr-0">
+            <button id="flip" class="absolute right-0 top-1/2 -translate-y-1/2 background hover:text-gray-300 has-tooltip
+                    flex items-center justify-center rounded-l-lg hover:rounded-none p-1 pr-0">
                 <span class="material-symbols-rounded">screen_rotation_up</span>
+                <span class="tooltip absolute right-full p-1 rounded-l-lg background w-max text-white">flip board</span>
             </button>
             <div class="evalbar rounded-b-xl overflow-hidden" role="progressbar">
                 <div id="evalBar" class="progress-bar"></div>
@@ -48,7 +51,7 @@
                                 <div id="engineLoadingBar" class="bg-emerald-500 w-0 rounded-full progress-bar invisible"></div>
                             </div>
                         </div>
-                        <div class="flex w-full items-center justify-center gap-4 lg:justify-between flex-wrap">
+                        <div class="flex w-full items-center justify-center gap-4 lg:justify-between lg:gap-2 flex-wrap">
                             <button id="unmakeMoveBtn"
                                     class="rounded-full py-2 px-4 sm:py-3 text-gray-100
                                     neumorphic neumorphic-btn transition-all
@@ -65,7 +68,7 @@
                                 engine move
                                 <span class="material-symbols-rounded">memory</span>
                             </button>
-                            <div class="flex flex-row lg:flex-col gap-1">
+                            <div class="flex flex-row sm:flex-col gap-1">
                                 <label class="neumorphic-checkbox flex flex-row items-center gap-2 cursor-pointer relative select-none text-sm">
                                     <input class="absolute opacity-0 w-0 h-0 cursor-pointer" id="autoWhite" type="checkbox"/>
                                     <i class="material-symbols-rounded text-white/30 rounded-lg">done</i>
