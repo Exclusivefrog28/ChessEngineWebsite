@@ -108,12 +108,6 @@ engine
             board.removeArrows(ARROW_TYPE.default);
         })
     })
-    .register('moveStart', (move) => {
-        board.addArrow(ARROW_TYPE.default, move.substring(0, 2), move.substring(2, 4))
-    })
-    .register('moveEnd', (move) => {
-        board.removeArrows(ARROW_TYPE.default, move.substring(0, 2), move.substring(2, 4))
-    })
     .register('log', (msg) => {
         const msgParts = msg.split(' ');
         const type = msgParts[0];
@@ -213,7 +207,7 @@ const makeMove = async (move) => {
     handleTurn();
 }
 
-function inputHandler(event) {
+const inputHandler = (event) => {
     board.removeMarkers(MARKER_TYPE.frame)
     board.removeMarkers(MARKER_TYPE.dot)
 
