@@ -19,6 +19,7 @@ document.getElementById("flip").addEventListener("click", () =>
 const engine = new OrganizedWorker("./src/engine.js")
 
 const elements = {
+    splash : document.getElementById("splash"),
     engineLoading: document.getElementById("engineLoading"),
     engineLoadingBar: document.getElementById("engineLoadingBar"),
     gameResults: document.getElementById("gameResults"),
@@ -78,6 +79,7 @@ engine
         elements.autoBlack.addEventListener("change", async (e) => {
             if (e.target.checked && !whiteToMove) playEngineMove()
         })
+        elements.splash.style.display = "none";
     })
     .register('updateDepth', (depth) => {
         elements.depthLabel.innerText = depth

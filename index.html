@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <title>chess engine</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
+    <meta name="theme-color" content="#C5A076">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="manifest" href="manifest.json"/>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"/>
 
+    <link rel="stylesheet" href="src/splash.css">
     <link rel="stylesheet" href="src/styles.css">
 
     <link rel="stylesheet" href="src/cm-chessboard/assets/chessboard.css"/>
@@ -25,6 +27,16 @@
     <script src="enable-threads.js"></script>
 </head>
 <body class="background">
+<div id="splash" class="fixed top-0 left-0 w-full h-full background z-20">
+    <div class="force-center splash-container">
+        <svg class='splash-animation' width="200" height="200" viewBox="0 0 40 40">
+            <use href="#wp" class="first" xlink:href="#wp"></use>
+            <use href="#bn" class="second" xlink:href="#bn"></use>
+            <use href="#wr" class="third" xlink:href="#wr"></use>
+            <use href="#bq" class="fourth" xlink:href="#bq"></use>
+        </svg>
+    </div>
+</div>
 <div class="md:container mx-auto lg:mt-8 mb-6">
     <div class="grid grid-cols-12">
         <div class="lg:col-span-6 lg:col-start-0 md:col-span-10 md:col-start-2 col-span-12 relative
@@ -73,7 +85,7 @@
                                 engine move
                                 <span class="material-symbols-rounded">memory</span>
                             </button>
-                            <div class="flex flex-row sm:flex-col gap-1">
+                            <div class="flex flex-row sm:flex-col gap-4 sm:gap-1">
                                 <label class="neumorphic-checkbox flex flex-row items-center gap-2 cursor-pointer relative select-none text-sm">
                                     <input class="absolute opacity-0 w-0 h-0 cursor-pointer" id="autoWhite" type="checkbox"/>
                                     <i class="material-symbols-rounded text-white/30 rounded-lg">done</i>
@@ -115,7 +127,7 @@
                 </div>
                 <div class="flex justify-around">
                     <div class="w-1/4 relative meter">
-                        <div class="force-center text-gray-300 text-center">
+                        <div class="force-center text-gray-300 text-center text-sm sm:text-base">
                             <span id="depthLabel" class="lg:text-2xl font-bold">0</span><br/>
                             <span>depth</span>
                         </div>
@@ -129,7 +141,7 @@
 
                     </div>
                     <div class="w-1/4 relative meter">
-                        <div class="force-center text-gray-300 text-center">
+                        <div class="force-center text-gray-300 text-center text-sm sm:text-base">
                             <span id="ttLabel" class="xl:text-2xl font-bold">0%</span><br/>
                             <span>TT fill</span>
                         </div>
