@@ -601,6 +601,10 @@ video {
   margin-bottom: 1.5rem;
 }
 
+.mt-\[1\.33rem\] {
+  margin-top: 1.33rem;
+}
+
 .block {
   display: block;
 }
@@ -1023,7 +1027,7 @@ video {
   content: "";
   position: absolute;
   border-radius: 50%;
-  margin: 0.3rem;
+  margin: 2%;
   top: 0;
   bottom: 0;
   right: 0;
@@ -1035,22 +1039,12 @@ video {
   content: "";
   position: absolute;
   border-radius: 50%;
-  margin: 2.2rem;
+  margin: 18%;
   top: 0;
   bottom: 0;
   right: 0;
   left: 0;
   box-shadow: 1px 2px 2px #141414 inset, -2px -2px 2px #212121 inset;
-}
-
-@media (max-width: 1280px) {
-  .meter::before {
-    margin: 0.5rem;
-  }
-
-  .meter::after {
-    margin: 1.5rem;
-  }
 }
 
 .circles {
@@ -1181,6 +1175,15 @@ video {
   .md\:mx-auto {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .md\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .md\:py-0 {
+    padding-top: 0px;
+    padding-bottom: 0px;
   }
 
   .md\:text-base {

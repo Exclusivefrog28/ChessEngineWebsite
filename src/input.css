@@ -111,7 +111,7 @@
     content: "";
     position: absolute;
     border-radius: 50%;
-    margin: 0.3rem;
+    margin: 2%;
     top: 0;
     bottom: 0;
     right: 0;
@@ -123,22 +123,12 @@
     content: "";
     position: absolute;
     border-radius: 50%;
-    margin: 2.2rem;
+    margin: 18%;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
     box-shadow: 1px 2px 2px #141414 inset, -2px -2px 2px #212121 inset;
-}
-
-@media (max-width: 1280px) {
-    .meter::before {
-        margin: 0.5rem;
-    }
-
-    .meter::after {
-        margin: 1.5rem;
-    }
 }
 
 .circles {
