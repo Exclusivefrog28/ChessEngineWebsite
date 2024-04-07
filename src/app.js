@@ -99,6 +99,7 @@ engine
             li.innerText = move;
             elements.pvList.appendChild(li);
         })
+        if (pvMoves.length < 2) return;
         const secondmove = pvMoves[1];
         const from = secondmove.substring(0, 2);
         const to = secondmove.substring(2, 4);
@@ -109,11 +110,12 @@ engine
         elements.pvList.children[1].addEventListener("mouseout", ()=>{
             board.removeArrows(ARROW_TYPE.default);
         })
-        // elements.pvList.children[1].addEventListener("click", ()=>{
-        //     board.movePiece(from, to, true);
-        //     board.removeArrows(ARROW_TYPE.default);
-        //     handleTurn(true, true);
-        // })
+        elements.pvList.children[1].addEventListener("click", async ()=>{
+            const result = await engine.call('parseandmove', secondmove);
+            board.setPosition(result, true);
+            markMove(from, to);
+            handleTurn(true, true);
+        })
     })
     .register('log', (msg) => {
         const msgParts = msg.split(' ');

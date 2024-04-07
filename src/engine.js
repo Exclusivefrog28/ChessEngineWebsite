@@ -36,6 +36,9 @@ Engine().then(function(engine) {
             const end = new Date().getTime();
             return {depth: depth, nodes: nodes, time: end - start}
         })
+        .register('parseandmove', (move) => {
+            return engine.ccall('parseandmove', 'string', ['string'], [move])
+        })
 })
 
 function getSquareIndex(square) {
