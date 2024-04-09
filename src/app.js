@@ -2,7 +2,7 @@ import OrganizedWorker from "./organized-workers.js";
 import {Chessboard, COLOR, FEN, INPUT_EVENT_TYPE, PIECE} from "/src/cm-chessboard/Chessboard.js"
 import {MARKER_TYPE, Markers} from "/src/cm-chessboard/extensions/markers/Markers.js"
 import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js"
-import {sigmoid} from "/src/util.js";
+import {displayScore, sigmoid} from "/src/util.js";
 import {ARROW_TYPE, Arrows} from "/src/cm-chessboard/extensions/arrows/Arrows.js";
 
 const board = new Chessboard(document.getElementById("board"), {
@@ -58,6 +58,7 @@ engine
             elements.autoWhite.checked = false;
             elements.autoBlack.checked = false;
             board.setPosition(fen, true);
+            elements.fenInput.value = fen;
             handleTurn();
         })
         elements.fenBtn.addEventListener("click", async () => {
@@ -65,6 +66,7 @@ engine
             elements.autoWhite.checked = false;
             elements.autoBlack.checked = false;
             board.setPosition(fen, true);
+            elements.fenInput.value = fen;
             const sideToMove = await engine.call('setBoardFen', fen);
             whiteToMove = sideToMove === 0;
             handleTurn(false, true);
@@ -113,6 +115,7 @@ engine
         elements.pvList.children[1].addEventListener("click", async ()=>{
             const result = await engine.call('parseandmove', secondmove);
             board.setPosition(result, true);
+            elements.fenInput.value = result;
             markMove(from, to);
             handleTurn(true, true);
         })
@@ -173,6 +176,7 @@ const playEngineMove = async () => {
     elements.engineLoading.style.visibility = "hidden";
     elements.engineLoadingBar.style.visibility = "hidden";
     board.setPosition(result.fen, true);
+    elements.fenInput.value = result.fen;
     markMove(result.start, result.end);
     handleTurn(true, false);
 }
@@ -180,15 +184,15 @@ const playEngineMove = async () => {
 
 const updateEval = async () => {
     let score = await engine.call('eval');
-    if (!whiteToMove) score *= -1
-    const blackAdvantage = score < 0
-    const evalBar = document.getElementById("evalBar")
-    const evalText = document.getElementById("evalText")
+    if (!whiteToMove) score *= -1;
+    const blackAdvantage = score < 0;
+    const evalBar = document.getElementById("evalBar");
+    const evalText = document.getElementById("evalText");
     let whitePercentage = sigmoid(score / 100) * 100;
-    evalBar.style.width = `${whitePercentage}%`
-    evalText.style.left = `${blackAdvantage ? (whitePercentage + 100) / 2 : whitePercentage / 2}%`
-    evalText.style.color = blackAdvantage ? "var(--white)" : "var(--black)"
-    evalText.innerHTML = blackAdvantage ? -score : score
+    evalBar.style.width = `${whitePercentage}%`;
+    evalText.style.left = `${blackAdvantage ? (whitePercentage + 100) / 2 : whitePercentage / 2}%`;
+    evalText.style.color = blackAdvantage ? "var(--white)" : "var(--black)";
+    evalText.innerHTML = blackAdvantage ? -displayScore(score) : displayScore(score);
 }
 
 const updateMoves = async () => {
@@ -213,6 +217,7 @@ const updateMoves = async () => {
 const makeMove = async (move) => {
     const fen = await engine.call('move', move);
     board.setPosition(fen, true);
+    elements.fenInput.value = fen;
     handleTurn();
 }
 
