@@ -5,6 +5,8 @@ import {PromotionDialog} from "/src/cm-chessboard/extensions/promotion-dialog/Pr
 import {displayScore, sigmoid} from "/src/util.js";
 import {ARROW_TYPE, Arrows} from "/src/cm-chessboard/extensions/arrows/Arrows.js";
 
+const startTime = new Date().getTime();
+
 const board = new Chessboard(document.getElementById("board"), {
     position: FEN.start,
     assetsUrl: "./src/cm-chessboard/assets/",
@@ -19,7 +21,7 @@ document.getElementById("flip").addEventListener("click", () =>
 const engine = new OrganizedWorker("./src/engine.js")
 
 const elements = {
-    splash : document.getElementById("splash"),
+    splash: document.getElementById("splash"),
     engineLoading: document.getElementById("engineLoading"),
     engineLoadingBar: document.getElementById("engineLoadingBar"),
     gameResults: document.getElementById("gameResults"),
@@ -29,7 +31,6 @@ const elements = {
     unmakeMoveBtn: document.getElementById("unmakeMoveBtn"),
     fenInput: document.getElementById("fenInput"),
     fenBtn: document.getElementById("fenBtn"),
-    perftBtn: document.getElementById("perftBtn"),
     depthLabel: document.getElementById("depthLabel"),
     depthMeter: document.getElementById("depthMeter"),
     ttLabel: document.getElementById("ttLabel"),
@@ -72,9 +73,6 @@ engine
             handleTurn(false, true);
 
         })
-        elements.perftBtn.addEventListener("click", async () => {
-            //TODO
-        })
         elements.autoWhite.addEventListener("change", async (e) => {
             if (e.target.checked && whiteToMove) playEngineMove()
         })
@@ -82,6 +80,7 @@ engine
             if (e.target.checked && !whiteToMove) playEngineMove()
         })
         elements.splash.style.display = "none";
+        log('success', `engine module loaded in ${(new Date().getTime()) - startTime} ms`);
     })
     .register('updateDepth', (depth) => {
         elements.depthLabel.innerText = depth
@@ -106,13 +105,13 @@ engine
         const from = secondmove.substring(0, 2);
         const to = secondmove.substring(2, 4);
         elements.pvList.children[1].style.cursor = "pointer";
-        elements.pvList.children[1].addEventListener("mouseover", ()=>{
+        elements.pvList.children[1].addEventListener("mouseover", () => {
             board.addArrow(ARROW_TYPE.default, from, to);
         })
-        elements.pvList.children[1].addEventListener("mouseout", ()=>{
+        elements.pvList.children[1].addEventListener("mouseout", () => {
             board.removeArrows(ARROW_TYPE.default);
         })
-        elements.pvList.children[1].addEventListener("click", async ()=>{
+        elements.pvList.children[1].addEventListener("click", async () => {
             const result = await engine.call('parseandmove', secondmove);
             board.setPosition(result, true);
             elements.fenInput.value = result;
@@ -123,27 +122,9 @@ engine
     .register('log', (msg) => {
         const msgParts = msg.split(' ');
         const type = msgParts[0];
-        const name = msgParts[1];
-        const args = msgParts.slice(2).join(' ');
+        const content = msgParts.slice(1).join(' ');
 
-        const li = document.createElement("li");
-        const p = document.createElement("p");
-        const h4 = document.createElement("h4");
-        const span1 = document.createElement("span");
-        const span2 = document.createElement("span");
-
-        li.className = 'flex flex-row flex-nowrap gap-2';
-        span1.innerText = type;
-        span2.innerText = name;
-        if (type === 'info') span1.className = 'text-yellow-500';
-        h4.appendChild(span1);
-        h4.appendChild(span2);
-        h4.className = 'flex flex-row flex-nowrap gap-2';
-        li.appendChild(h4);
-        p.innerText = args;
-        p.className = 'text-nowrap';
-        li.appendChild(p);
-        elements.log.appendChild(li);
+        log(type, content);
     })
 
 const handleTurn = (switchPlayer = true, clearPV = true) => {
@@ -180,7 +161,6 @@ const playEngineMove = async () => {
     markMove(result.start, result.end);
     handleTurn(true, false);
 }
-
 
 const updateEval = async () => {
     let score = await engine.call('eval');
@@ -219,6 +199,31 @@ const makeMove = async (move) => {
     board.setPosition(fen, true);
     elements.fenInput.value = fen;
     handleTurn();
+}
+
+const log = (type, content) => {
+    const li = document.createElement("li");
+    const p = document.createElement("p");
+    const h4 = document.createElement("h4");
+
+    li.className = 'flex flex-row flex-nowrap gap-2';
+    h4.innerText = type;
+
+    switch (type) {
+        case 'info':
+            h4.className = 'text-yellow-400';
+            break;
+        case 'success':
+            h4.className = 'text-green-400';
+            break;
+    }
+
+    li.appendChild(h4);
+    p.innerText = content;
+    p.className = 'text-nowrap';
+    li.appendChild(p);
+    elements.log.appendChild(li);
+    elements.log.parentElement.scrollTop = elements.log.parentElement.scrollHeight;
 }
 
 const inputHandler = (event) => {

@@ -117,13 +117,10 @@
                     <h4>Principal Variation:</h4>
                     <ul id="pvList" class="flex flex-wrap gap-4"></ul>
                 </div>
-                <div class="h-full flex-grow-0 overflow-clip w-4/5 mx-auto p-3 rounded-xl neumorphic">
-                    <ul id="log" class="flex flex-col justify-end h-full w-full overflow-y-clip overflow-x-auto p-2 bg-black bg-opacity-40 rounded-lg">
-                        <li class="flex flex-row flex-nowrap gap-2 invisible">
-                            <h4><span class="text-yellow-500">type</span><span>name</span></h4>
-                            <p class="text-nowrap">msg</p>
-                        </li>
-                    </ul>
+                <div class="h-full min-h-0 flex-grow-0 w-4/5 mx-auto p-3 rounded-xl neumorphic overflow-hidden">
+                    <div class="h-full overflow-scroll bg-black bg-opacity-40 rounded-lg">
+                        <ul id="log" class="flex flex-col justify-end w-full p-2"></ul>
+                    </div>
                 </div>
                 <div class="flex justify-around">
                     <div class="w-1/4 relative meter">
@@ -155,11 +152,6 @@
             </div>
         </div>
     </div>
-</div>
-<div class="md:container md:mx-auto mb-40">
-    <button id="perftBtn" class="hidden">
-        Run perft
-    </button>
 </div>
 <script type="module" src="src/app.js"></script>
 </body>

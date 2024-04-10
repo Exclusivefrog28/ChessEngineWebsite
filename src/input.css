@@ -146,3 +146,26 @@
 .has-tooltip:hover .tooltip {
     @apply opacity-100 z-50 scale-x-100
 }
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background: transparent;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background);
+}
+
+::-webkit-scrollbar-corner{
+    background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #A0A0A0;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6E6E6E;
+}
