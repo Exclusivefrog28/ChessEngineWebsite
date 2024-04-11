@@ -206,7 +206,7 @@ const log = (type, content) => {
     const p = document.createElement("p");
     const h4 = document.createElement("h4");
 
-    li.className = 'flex flex-row flex-nowrap gap-2';
+    li.className = 'flex flex-row flex-nowrap gap-2 w-max';
     h4.innerText = type;
 
     switch (type) {
@@ -220,7 +220,7 @@ const log = (type, content) => {
 
     li.appendChild(h4);
     p.innerText = content;
-    p.className = 'text-nowrap';
+    p.className = 'text-nowrap whitespace-nowrap';
     li.appendChild(p);
     elements.log.appendChild(li);
     elements.log.parentElement.scrollTop = elements.log.parentElement.scrollHeight;
