@@ -172,7 +172,7 @@ const updateEval = async () => {
     evalBar.style.width = `${whitePercentage}%`;
     evalText.style.left = `${blackAdvantage ? (whitePercentage + 100) / 2 : whitePercentage / 2}%`;
     evalText.style.color = blackAdvantage ? "var(--white)" : "var(--black)";
-    evalText.innerHTML = blackAdvantage ? -displayScore(score) : displayScore(score);
+    evalText.innerHTML = blackAdvantage ? displayScore(-score) : displayScore(score);
 }
 
 const updateMoves = async () => {
@@ -185,11 +185,15 @@ const updateMoves = async () => {
             elements.winner.textContent = whiteToMove ? "Black won!" : "White won!"
             elements.winMethod.textContent = "by checkmate"
             elements.gameResults.style.display = "block"
+            elements.autoWhite.checked = false;
+            elements.autoBlack.checked = false;
             break;
         case 'stalemate':
             elements.winner.textContent = "It's a draw!"
             elements.winMethod.textContent = "by stalemate"
             elements.gameResults.style.display = "block"
+            elements.autoWhite.checked = false;
+            elements.autoBlack.checked = false;
             break;
     }
 }
