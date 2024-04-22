@@ -101,21 +101,23 @@ engine
             elements.pvList.appendChild(li);
         })
         if (pvMoves.length < 2) return;
-        const secondmove = pvMoves[1];
-        const from = secondmove.substring(0, 2);
-        const to = secondmove.substring(2, 4);
-        elements.pvList.children[1].style.cursor = "pointer";
-        elements.pvList.children[1].addEventListener("mouseover", () => {
-            board.addArrow(ARROW_TYPE.default, from, to);
-        })
-        elements.pvList.children[1].addEventListener("mouseout", () => {
-            board.removeArrows(ARROW_TYPE.default);
-        })
+        for(let i = 0; i < elements.pvList.children.length; i++){
+            const child = elements.pvList.children[i];
+            const move = pvMoves[i];
+            child.style.cursor = "pointer";
+            child.addEventListener("mouseover", () => {
+                board.addArrow(ARROW_TYPE.default, move.substring(0, 2), move.substring(2, 4));
+            })
+            child.addEventListener("mouseout", () => {
+                board.removeArrows(ARROW_TYPE.default);
+            })
+        }
         elements.pvList.children[1].addEventListener("click", async () => {
-            const result = await engine.call('parseandmove', secondmove);
+            board.removeArrows(ARROW_TYPE.default);
+            const result = await engine.call('parseandmove', pvMoves[1]);
             board.setPosition(result, true);
             elements.fenInput.value = result;
-            markMove(from, to);
+            markMove(pvMoves[1].substring(0, 2), pvMoves[1].substring(2, 4));
             handleTurn(true, true);
         })
     })
