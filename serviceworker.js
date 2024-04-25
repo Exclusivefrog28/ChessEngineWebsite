@@ -1,13 +1,68 @@
-const VERSION = "v0.8.0";
+const VERSION = "v0.8.1";
 const CACHE_NAME = `chessengine-${VERSION}`;
+
+const APP_STATIC_RESOURES = [
+    "/",
+    "/index.html",
+    "/manifest.json",
+    "/src/app.js",
+    "/src/ChessEngine.js",
+    "/src/ChessEngine.wasm",
+    "/src/ChessEngine.worker.js",
+    "/src/engine.js",
+    "/src/organized-workers.js",
+    "/src/splash.css",
+    "/src/styles.css",
+    "/src/util.js",
+    "/src/assets/arrows.css",
+    "/src/cm-chessboard/assets/chessboard.css",
+    "/src/cm-chessboard/assets/pieces/staunty.svg",
+    "/src/cm-chessboard/assets/extensions/arrows/arrows.css",
+    "/src/cm-chessboard/assets/extensions/arrows/arrows.svg",
+    "/src/cm-chessboard/assets/extensions/markers/markers.css",
+    "/src/cm-chessboard/assets/extensions/markers/markers.svg",
+    "/src/cm-chessboard/assets/extensions/promotion-dialog/promotion-dialog.css",
+    "/src/cm-chessboard/extensions/arrows/Arrows.js",
+    "/src/cm-chessboard/extensions/markers/Markers.js",
+    "/src/cm-chessboard/extensions/promotion-dialog/PromotionDialog.js",
+    "/src/cm-chessboard/lib/Svg.js",
+    "/src/cm-chessboard/lib/Utils.js",
+    "/src/cm-chessboard/model/ChessboardState.js",
+    "/src/cm-chessboard/model/Extension.js",
+    "/src/cm-chessboard/model/Position.js",
+    "/src/cm-chessboard/view/ChessboardView.js",
+    "/src/cm-chessboard/view/PositionAnimationsQueue.js",
+    "/src/cm-chessboard/view/VisualMoveInput.js",
+    "/src/cm-chessboard/Chessboard.js",
+    "/android-chrome-512x512.png",
+]
 // NOTE: This file creates a service worker that cross-origin-isolates the page (read more here: https://web.dev/coop-coep/) which allows us to use wasm threads.
 // Normally you would set the COOP and COEP headers on the server to do this, but GitHub Pages doesn't allow this, so this is a hack to do that.
 
 /* Edited version of: coi-serviceworker v0.1.6 - Guido Zuidhof, licensed under MIT */
 // From here: https://github.com/gzuidhof/coi-serviceworker
 if (typeof window === 'undefined') {
-    self.addEventListener("install", () => self.skipWaiting());
-    self.addEventListener("activate", e => e.waitUntil(self.clients.claim()));
+    self.addEventListener("install", (event) => {
+        event.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_STATIC_RESOURES))
+        )
+    })
+    self.addEventListener("activate", (event) => {
+        event.waitUntil(
+            (async () => {
+                const names = await caches.keys();
+                await Promise.all(
+                    names.map((name) => {
+                        if (name !== CACHE_NAME) {
+                            return caches.delete(name);
+                        }
+                    }),
+                );
+                await clients.claim();
+            })(),
+        );
+    });
+
 
     async function handleFetch(request) {
         if (request.cache === "only-if-cached" && request.mode !== "same-origin") {

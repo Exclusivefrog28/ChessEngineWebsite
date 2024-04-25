@@ -23,8 +23,6 @@
     <link rel="stylesheet" href="src/cm-chessboard/assets/extensions/markers/markers.css"/>
     <link rel="stylesheet" href="src/cm-chessboard/assets/extensions/promotion-dialog/promotion-dialog.css"/>
     <link rel="stylesheet" href="src/assets/arrows.css">
-
-    <script src="enable-threads.js"></script>
 </head>
 <body class="background">
 <div id="splash" class="fixed top-0 left-0 w-full h-full background z-20">
@@ -154,10 +152,6 @@
     </div>
 </div>
 <script type="module" src="src/app.js"></script>
-<script>
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("src/sw.js");
-    }
-</script>
+<script src="serviceworker.js"></script>
 </body>
 </html>
