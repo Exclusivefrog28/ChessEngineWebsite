@@ -1,4 +1,4 @@
-const VERSION = "v0.9.0";
+const VERSION = "v0.9.1";
 const CACHE_NAME = `chessengine-${VERSION}`;
 
 const APP_STATIC_RESOURES = [
@@ -36,33 +36,9 @@ const APP_STATIC_RESOURES = [
     "/src/cm-chessboard/Chessboard.js",
     "/android-chrome-512x512.png",
 ]
-// NOTE: This file creates a service worker that cross-origin-isolates the page (read more here: https://web.dev/coop-coep/) which allows us to use wasm threads.
-// Normally you would set the COOP and COEP headers on the server to do this, but GitHub Pages doesn't allow this, so this is a hack to do that.
-
 /* Edited version of: coi-serviceworker v0.1.6 - Guido Zuidhof, licensed under MIT */
 // From here: https://github.com/gzuidhof/coi-serviceworker
 if (typeof window === 'undefined') {
-    self.addEventListener("install", (event) => {
-        event.waitUntil(
-            caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_STATIC_RESOURES))
-        )
-    })
-    self.addEventListener("activate", (event) => {
-        event.waitUntil(
-            (async () => {
-                const names = await caches.keys();
-                await Promise.all(
-                    names.map((name) => {
-                        if (name !== CACHE_NAME) {
-                            return caches.delete(name);
-                        }
-                    }),
-                );
-                await clients.claim();
-            })(),
-        );
-    });
-
 
     async function handleFetch(request) {
         if (request.cache === "only-if-cached" && request.mode !== "same-origin") {
@@ -92,7 +68,9 @@ if (typeof window === 'undefined') {
         const cachedResponse = await cache.match(request.url);
         if (cachedResponse) {
             r = cachedResponse;
-        } else r = await fetch(request).catch(e => console.error(e));
+        } else {
+            r = await fetch(request).catch(e => console.error(e))
+        }
 
         if (r.status === 0) {
             return r;
@@ -112,15 +90,45 @@ if (typeof window === 'undefined') {
 
 } else {
     (async function () {
+        const src = window.document.currentScript.src;
+
         if (window.crossOriginIsolated !== false) return;
 
-        let registration = await navigator.serviceWorker.register(window.document.currentScript.src).catch(e => console.error("COOP/COEP Service Worker failed to register:", e));
+        let registration = await navigator.serviceWorker.register(src).catch(e => console.error("COOP/COEP Service Worker failed to register:", e));
         if (registration) {
             console.log("COOP/COEP Service Worker registered", registration.scope);
 
             registration.addEventListener("updatefound", () => {
                 console.log("Reloading page to make use of updated COOP/COEP Service Worker.");
                 window.location.reload();
+            });
+
+            registration.addEventListener("install", (event) => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_STATIC_RESOURES))
+                )
+            })
+            registration.addEventListener("activate", (event) => {
+                event.waitUntil(
+                    (async () => {
+                        let registrations = await navigator.serviceWorker.getRegistrations();
+                        for (let registration of registrations) {
+                            if (registration.active && !registration.active.scriptURL.includes("serviceworker.js")) {
+                                await registration.unregister();
+                                console.log("Old service worker unregistered");
+                            }
+                        }
+                        const names = await caches.keys();
+                        await Promise.all(
+                            names.map((name) => {
+                                if (name !== CACHE_NAME) {
+                                    return caches.delete(name);
+                                }
+                            }),
+                        );
+                        await clients.claim();
+                    })(),
+                );
             });
 
             // If the registration is active, but it's not controlling the page
@@ -132,8 +140,4 @@ if (typeof window === 'undefined') {
     })();
 }
 
-// Code to deregister:
-// let registrations = await navigator.serviceWorker.getRegistrations();
-// for(let registration of registrations) {
-//   await registration.unregister();
-// }
+
