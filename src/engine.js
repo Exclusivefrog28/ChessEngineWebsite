@@ -14,10 +14,8 @@ manager
         engine.ccall("startSearch");
         return 1;
     })
-    .register('stopSearch', () => {
-        let move = JSON.parse(engine.ccall("stopSearch", 'string',['number'], [1000]));
-        let fen = engine.ccall('move', 'string', ['number', 'number', 'number', 'number', 'number'], [getSquareIndex(move.start), getSquareIndex(move.end), move.flag, move.promotionType, move.player]);
-        return {fen: fen, start: move.start, end: move.end};
+    .register('stopSearch', (timeOut) => {
+        return JSON.parse(engine.ccall("stopSearch", 'string',['number'], [timeOut]));
     })
     .register('eval', () => {
         return engine.ccall('eval', 'int')

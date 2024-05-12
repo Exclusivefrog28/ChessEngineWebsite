@@ -90,6 +90,59 @@
     text-shadow: 1px 1px 0 #212121;
 }
 
+.neumorphic-switch{
+    width: 6rem;
+}
+
+.neumorphic-switch label{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 3rem;
+    background: var(--background);
+    position: relative;
+    cursor: pointer;
+    border-radius: 1.6rem;
+}
+
+.neumorphic-switch label span{
+    align-content: center;
+    font-size: 2rem;
+    position: absolute;
+    left: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    transition: all 0.4s ease;
+}
+
+.neumorphic-switch label::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    box-shadow: 0.3rem 0.3rem 0.6rem #141414, -0.2rem -0.2rem 0.5rem #212121;
+    transition: all 0.4s ease;
+}
+
+.neumorphic-switch input:checked ~ label::before {
+    box-shadow: inset 1px 1px 2px #141414, inset -1px -1px 2px #212121;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(180deg);
+    }
+}
+
+.neumorphic-switch input:checked ~ label span {
+    animation: spin 1s 0s infinite linear;
+    left: 55%;
+}
+
+
 .neumorphic-progress {
     background: var(--background);
     box-shadow: inset 1px 1px 2px #141414, inset -1px -1px 2px #212121;
@@ -140,7 +193,7 @@
 }
 
 .tooltip {
-    @apply opacity-0 absolute transition-all scale-x-0 origin-right;
+    @apply opacity-0 absolute transition-all scale-x-0;
 }
 
 .has-tooltip:hover .tooltip {

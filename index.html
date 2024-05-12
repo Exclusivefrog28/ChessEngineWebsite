@@ -39,13 +39,13 @@
     <div class="grid grid-cols-12">
         <div class="lg:col-span-6 lg:col-start-0 md:col-span-10 md:col-start-2 col-span-12 relative
                     neumorphic-shadow lg:max-h-[calc(100vh-4rem-1.33rem)] lg:aspect-square sm:mx-auto md:mx-0">
-            <div id="board" class="sm:rounded-t-xl overflow-hidden"></div>
+            <div id="board" class="sm:rounded-t-xl data-[challenge=true]:sm:rounded-b-xl challenge-affected overflow-hidden"></div>
             <button id="flip" class="absolute right-0 top-1/2 -translate-y-1/2 background hover:text-gray-300 has-tooltip
                     flex items-center justify-center rounded-l-lg hover:rounded-none p-1 pr-0">
                 <span class="material-symbols-rounded">screen_rotation_up</span>
-                <span class="tooltip absolute right-full p-1 rounded-l-lg background w-max text-white">flip board</span>
+                <span class="tooltip origin-right absolute right-full p-1 rounded-l-lg background w-max text-white">flip board</span>
             </button>
-            <div class="evalbar rounded-b-xl overflow-hidden" role="progressbar">
+            <div class="evalbar rounded-b-xl overflow-hidden data-[challenge=true]:hidden challenge-affected" role="progressbar">
                 <div id="evalBar" class="progress-bar"></div>
                 <p id="evalText"></p>
             </div>
@@ -66,34 +66,47 @@
                                 <div id="engineLoadingBar" class="bg-emerald-500 w-0 rounded-full progress-bar invisible"></div>
                             </div>
                         </div>
-                        <div class="flex w-full items-center justify-center gap-4 sm:justify-between lg:gap-2 flex-wrap">
-                            <button id="unmakeMoveBtn"
-                                    class="rounded-full py-2 px-4 sm:py-3 text-gray-100
+                        <div class="flex w-full items-center justify-center space-y-4 sm:justify-between sm:space-y-0 lg:justify-center lg:space-y-4 xl:space-y-0 xl:justify-between flex-wrap">
+                            <div class="flex flex-row gap-4 items-center w-full justify-between sm:w-auto lg:w-full xl:w-auto">
+                                <button id="unmakeMoveBtn"
+                                        class="rounded-full h-12 py-2 px-4 sm:py-3 text-gray-100
                                     neumorphic neumorphic-btn transition-all
                                     flex gap-2 items-center
                                     text-sm md:text-base">
-                                takeback
-                                <span class="material-symbols-rounded">undo</span>
-                            </button>
-                            <button id="engineMoveBtn"
-                                    class="rounded-full py-2 px-4 sm:py-3 text-gray-100
+                                    Takeback
+                                    <span class="material-symbols-rounded">undo</span>
+                                </button>
+                                <button id="engineMoveBtn"
+                                        class="rounded-full h-12 py-2 px-4 sm:py-3 text-gray-100
                                     neumorphic neumorphic-btn transition-all
                                     flex gap-2 items-center
                                     text-sm md:text-base">
-                                engine move
-                                <span class="material-symbols-rounded">memory</span>
-                            </button>
-                            <div class="flex flex-row sm:flex-col gap-4 sm:gap-1">
-                                <label class="neumorphic-checkbox flex flex-row items-center gap-2 cursor-pointer relative select-none text-sm">
-                                    <input class="absolute opacity-0 w-0 h-0 cursor-pointer" id="autoWhite" type="checkbox"/>
-                                    <i class="material-symbols-rounded text-white/30 rounded-lg">done</i>
-                                    auto white
-                                </label>
-                                <label class="neumorphic-checkbox flex flex-row items-center gap-2 cursor-pointer relative select-none text-sm">
-                                    <input class="absolute opacity-0 w-0 h-0 cursor-pointer" id="autoBlack" type="checkbox"/>
-                                    <i class="material-symbols-rounded text-white/30 rounded-lg">done</i>
-                                    auto black
-                                </label>
+                                    Engine Move
+                                    <span class="brightness-200 grayscale text-xl">✨</span>
+                                </button>
+                            </div>
+                            <div class="flex flex-row gap-4 items-center w-full justify-between sm:w-auto lg:w-full xl:w-auto">
+                                <div class="neumorphic-switch has-tooltip relative">
+                                    <input class="hidden" id="alwaysSearch" type="checkbox">
+                                    <label for="alwaysSearch">
+                                        <span class="material-symbols-rounded select-none">
+                                            memory
+                                        </span>
+                                    </label>
+                                    <span class="tooltip origin-top text-center text-nowrap left-1/2 -translate-x-1/2">always search</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="neumorphic-checkbox flex flex-row items-center gap-2 cursor-pointer relative select-none text-sm">
+                                        <input class="absolute opacity-0 w-0 h-0 cursor-pointer" id="autoWhite" type="checkbox"/>
+                                        <i class="material-symbols-rounded text-white/30 rounded-lg">done</i>
+                                        auto white
+                                    </label>
+                                    <label class="neumorphic-checkbox flex flex-row items-center gap-2 cursor-pointer relative select-none text-sm">
+                                        <input class="absolute opacity-0 w-0 h-0 cursor-pointer" id="autoBlack" type="checkbox"/>
+                                        <i class="material-symbols-rounded text-white/30 rounded-lg">done</i>
+                                        auto black
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -105,46 +118,51 @@
                                 class="rounded-full p-2 sm:py-3 sm:px-4 text-gray-100
                                 neumorphic neumorphic-btn transition-all
                                 flex gap-2 items-center
-                                text-sm md:text-base" >
-                            set&nbsp;pos
+                                text-sm md:text-base">
+                            Set&nbsp;Pos
                             <span class="material-symbols-rounded">edit_square</span>
                         </button>
                     </div>
                 </div>
-                <div id="pvDiv" class="w-4/5 mx-auto space-y-2 hidden">
-                    <h4>Principal Variation:</h4>
-                    <ul id="pvList" class="flex flex-wrap gap-4"></ul>
+                <div class="w-4/5 mx-auto data-[challenge=true]:hidden challenge-affected">
+                    <ul id="pvList" class="flex gap-4 flex-nowrap overflow-x-hidden"></ul>
                 </div>
-                <div class="h-full min-h-0 flex-grow-0 w-4/5 mx-auto p-3 rounded-xl neumorphic overflow-hidden">
+                <div class="h-full min-h-0 flex-grow-0 w-4/5 mx-auto p-3 rounded-xl neumorphic overflow-hidden data-[challenge=true]:hidden challenge-affected">
                     <div class="h-full overflow-scroll bg-black bg-opacity-40 rounded-lg">
                         <ul id="log" class="flex flex-col justify-end w-full p-2"></ul>
                     </div>
                 </div>
-                <div class="flex justify-around">
-                    <div class="w-1/4 relative meter">
-                        <div class="force-center text-gray-300 text-center text-sm sm:text-base">
-                            <span id="depthLabel" class="lg:text-2xl font-bold">0</span><br/>
-                            <span>depth</span>
+                <div class="flex flex-col sm:flex-row justify-center items-center sm:items-end gap-6">
+                    <div class="flex gap-6 w-4/5 sm:w-1/2 data-[challenge=true]:hidden challenge-affected">
+                        <div class="w-1/2 relative meter">
+                            <div class="force-center text-gray-300 text-center text-sm sm:text-base">
+                                <span id="depthLabel" class="lg:text-2xl font-bold">0</span><br/>
+                                <span>Depth</span>
+                            </div>
+                            <svg class="circles" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                                <circle r="40" cx="50" cy="50" stroke-width="7" fill="transparent" stroke="#272727"></circle>
+                                <circle id="depthMeter" r="40" cx="50" cy="50" stroke-width="7" stroke-dasharray="245" stroke-dashoffset="238" fill="transparent" stroke="#10B981"
+                                        stroke-linecap="round" class="long-transition"></circle>
+                            </svg>
                         </div>
-                        <svg class="circles" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-                            <circle r="40" cx="50" cy="50" stroke-width="7" fill="transparent" stroke="#272727"></circle>
-                            <circle id="depthMeter" r="40" cx="50" cy="50" stroke-width="7" stroke-dasharray="245" stroke-dashoffset="238" fill="transparent" stroke="#10B981"
-                                    stroke-linecap="round" class="long-transition"></circle>
-                        </svg>
-                    </div>
-                    <div>
-
-                    </div>
-                    <div class="w-1/4 relative meter">
-                        <div class="force-center text-gray-300 text-center text-sm sm:text-base">
-                            <span id="ttLabel" class="xl:text-2xl font-bold">0%</span><br/>
-                            <span>TT fill</span>
+                        <div class="w-1/2 relative meter">
+                            <div class="force-center text-gray-300 text-center text-sm sm:text-base">
+                                <span id="ttLabel" class="xl:text-2xl font-bold">0%</span><br/>
+                                <span>TTable</span>
+                            </div>
+                            <svg class="circles" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                                <circle r="40" cx="50" cy="50" stroke-width="7" fill="transparent" stroke="#272727"></circle>
+                                <circle id="ttMeter" r="40" cx="50" cy="50" stroke-width="7" stroke-dasharray="245" stroke-dashoffset="238" fill="transparent" stroke="#10B981"
+                                        stroke-linecap="round" class="long-transition"></circle>
+                            </svg>
                         </div>
-                        <svg class="circles" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-                            <circle r="40" cx="50" cy="50" stroke-width="7" fill="transparent" stroke="#272727"></circle>
-                            <circle id="ttMeter" r="40" cx="50" cy="50" stroke-width="7" stroke-dasharray="245" stroke-dashoffset="238" fill="transparent" stroke="#10B981"
-                                    stroke-linecap="round" class="long-transition"></circle>
-                        </svg>
+                    </div>
+                    <div class="w-auto sm:w-1/4 h-fit px-1 py-4 rounded-2xl neumorphic flex flex-row gap-4 justify-center items-center">
+                        Challenge mode
+                        <label class="neumorphic-checkbox flex flex-row items-center cursor-pointer relative select-none text-sm">
+                            <input class="absolute opacity-0 w-0 h-0 cursor-pointer" id="challengeMode" type="checkbox"/>
+                            <i class="material-symbols-rounded text-white/30 rounded-lg p-1">strategy</i>
+                        </label>
                     </div>
                 </div>
             </div>

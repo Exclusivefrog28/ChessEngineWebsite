@@ -17,6 +17,13 @@ const board = new Chessboard(document.getElementById("board"), {
 document.getElementById("flip").addEventListener("click", () =>
     board.setOrientation(board.getOrientation() === COLOR.white ? COLOR.black : COLOR.white, true)
 )
+document.getElementById("challengeMode").addEventListener("change", async (e) => {
+    const elements = document.getElementsByClassName('challenge-affected');
+    for (const element of elements) {
+        element.dataset.challenge = e.target.checked;
+    }
+})
+
 
 const engine = new OrganizedWorker("./src/engine.js")
 
@@ -35,15 +42,17 @@ const elements = {
     depthMeter: document.getElementById("depthMeter"),
     ttLabel: document.getElementById("ttLabel"),
     ttMeter: document.getElementById("ttMeter"),
-    pvDiv: document.getElementById("pvDiv"),
     pvList: document.getElementById("pvList"),
     log: document.getElementById("log"),
+    alwaysSearch: document.getElementById("alwaysSearch"),
     autoWhite: document.getElementById("autoWhite"),
-    autoBlack: document.getElementById("autoBlack"),
+    autoBlack: document.getElementById("autoBlack")
 }
 
-let moves = []
-let whiteToMove = true
+let moves = [];
+let whiteToMove = true;
+let alwaysSearch = false;
+let searching = false;
 
 engine
     .register('ready', () => {
@@ -54,24 +63,43 @@ engine
             playEngineMove();
         })
         elements.unmakeMoveBtn.addEventListener("click", async () => {
+            if (alwaysSearch) await stopSearch(0)
             const fen = await engine.call('unMakeMove');
             elements.gameResults.style.display = "none";
             elements.autoWhite.checked = false;
             elements.autoBlack.checked = false;
             board.setPosition(fen, true);
             elements.fenInput.value = fen;
-            handleTurn();
+            elements.pvList.innerHTML = "";
+            board.removeMarkers(MARKER_TYPE.square);
+            await handleTurn(true);
+            toggleEngineFeatures(true);
+            if (alwaysSearch) await startSearch();
         })
         elements.fenBtn.addEventListener("click", async () => {
+            if (alwaysSearch) await stopSearch(0);
             const fen = elements.fenInput.value;
+            elements.gameResults.style.display = "none";
             elements.autoWhite.checked = false;
             elements.autoBlack.checked = false;
             board.setPosition(fen, true);
             elements.fenInput.value = fen;
             const sideToMove = await engine.call('setBoardFen', fen);
             whiteToMove = sideToMove === 0;
-            handleTurn(false, true);
+            elements.pvList.innerHTML = "";
+            board.removeMarkers(MARKER_TYPE.square);
+            await handleTurn(false);
+            toggleEngineFeatures(true);
+            if (alwaysSearch) await startSearch();
 
+        })
+        elements.alwaysSearch.addEventListener("change", async (e) => {
+            alwaysSearch = e.target.checked
+            if (e.target.checked) {
+                await startSearch();
+            } else {
+                await stopSearch(0);
+            }
         })
         elements.autoWhite.addEventListener("change", async (e) => {
             if (e.target.checked && whiteToMove) playEngineMove()
@@ -93,7 +121,6 @@ engine
     })
     .register('updatePV', (pv) => {
         board.removeArrows(ARROW_TYPE.default);
-        elements.pvDiv.style.display = "block";
         const pvMoves = pv.split(" ");
         elements.pvList.innerHTML = "";
         pvMoves.forEach((move) => {
@@ -101,8 +128,7 @@ engine
             li.innerText = move;
             elements.pvList.appendChild(li);
         })
-        if (pvMoves.length < 2) return;
-        for(let i = 0; i < elements.pvList.children.length; i++){
+        for (let i = 0; i < elements.pvList.children.length; i++) {
             const child = elements.pvList.children[i];
             const move = pvMoves[i];
             child.style.cursor = "pointer";
@@ -113,14 +139,14 @@ engine
                 board.removeArrows(ARROW_TYPE.default);
             })
         }
-        elements.pvList.children[1].addEventListener("click", async () => {
+        elements.pvList.firstChild.addEventListener("click", async () => {
             board.removeArrows(ARROW_TYPE.default);
-            const result = await engine.call('parseandmove', pvMoves[1]);
-            board.setPosition(result, true);
-            elements.fenInput.value = result;
-            markMove(pvMoves[1].substring(0, 2), pvMoves[1].substring(2, 4));
-            handleTurn(true, true);
+            makeMove({start: pvMoves[0].substring(0, 2), end: pvMoves[0].substring(2, 4)});
         })
+    })
+    .register('updateEvaluation', (score) => {
+        console.log('updateEvaluation')
+        updateEval(-score);
     })
     .register('log', (msg) => {
         const msgParts = msg.split(' ');
@@ -130,18 +156,39 @@ engine
         log(type, content);
     })
 
-const handleTurn = (switchPlayer = true, clearPV = true) => {
+const handleTurn = async (switchPlayer = true) => {
     board.removeMarkers(MARKER_TYPE.frame);
-    updateMoves();
-    updateEval();
+    await updateMoves();
+    await updateEval();
     if (switchPlayer) whiteToMove = !whiteToMove;
-    if (clearPV) elements.pvDiv.style.display = "none";
+    decrementPV();
     if ((whiteToMove && elements.autoWhite.checked) || (!whiteToMove && elements.autoBlack.checked)) {
-        playEngineMove()
+        await playEngineMove()
     }
 }
 
+const startSearch = async () => {
+    if (searching) return;
+    searching = true;
+    await engine.call('startSearch');
+}
+
+const stopSearch = async (timeOut) => {
+    if (!searching) return 0;
+    const result = await engine.call('stopSearch', timeOut);
+    searching = false;
+    return result;
+}
+
+
 const playEngineMove = async () => {
+    if (alwaysSearch) await stopSearch(0)
+
+    elements.unmakeMoveBtn.disabled = true;
+    elements.fenBtn.disabled = true;
+    elements.engineMoveBtn.disabled = true;
+    elements.alwaysSearch.disabled = true;
+
     elements.engineLoading.style.visibility = "visible";
     elements.engineLoadingBar.style.visibility = "visible";
     elements.engineLoadingBar.style.width = "0%";
@@ -153,20 +200,22 @@ const playEngineMove = async () => {
     }, 10);
 
 
-    await engine.call('startSearch');
-    const result = await engine.call('stopSearch');
+    await startSearch();
+    const result = await stopSearch(1000);
 
     clearInterval(interval);
     elements.engineLoading.style.visibility = "hidden";
     elements.engineLoadingBar.style.visibility = "hidden";
-    board.setPosition(result.fen, true);
-    elements.fenInput.value = result.fen;
-    markMove(result.start, result.end);
-    handleTurn(true, false);
+    await makeMove(result);
+
+    elements.unmakeMoveBtn.disabled = false;
+    elements.fenBtn.disabled = false;
+    elements.engineMoveBtn.disabled = false;
+    elements.alwaysSearch.disabled = false;
 }
 
-const updateEval = async () => {
-    let score = await engine.call('eval');
+const updateEval = async (score = undefined) => {
+    if (!score) score = await engine.call('eval');
     if (!whiteToMove) score *= -1;
     const blackAdvantage = score < 0;
     const evalBar = document.getElementById("evalBar");
@@ -176,6 +225,7 @@ const updateEval = async () => {
     evalText.style.left = `${blackAdvantage ? (whitePercentage + 100) / 2 : whitePercentage / 2}%`;
     evalText.style.color = blackAdvantage ? "var(--white)" : "var(--black)";
     evalText.innerHTML = blackAdvantage ? displayScore(-score) : displayScore(score);
+
 }
 
 const updateMoves = async () => {
@@ -183,29 +233,43 @@ const updateMoves = async () => {
     switch (result.state) {
         case 'normal':
             moves = result.moves
-            break;
+            return;
         case 'checkmate':
             elements.winner.textContent = whiteToMove ? "Black won!" : "White won!"
             elements.winMethod.textContent = "by checkmate"
-            elements.gameResults.style.display = "block"
-            elements.autoWhite.checked = false;
-            elements.autoBlack.checked = false;
             break;
         case 'stalemate':
             elements.winner.textContent = "It's a draw!"
             elements.winMethod.textContent = "by stalemate"
-            elements.gameResults.style.display = "block"
-            elements.autoWhite.checked = false;
-            elements.autoBlack.checked = false;
+
             break;
     }
+    elements.gameResults.style.display = "block"
+    elements.autoWhite.checked = false;
+    elements.autoBlack.checked = false;
+    elements.alwaysSearch.checked = false;
+    elements.pvList.innerHTML = "";
+    toggleEngineFeatures(false);
 }
 
 const makeMove = async (move) => {
+    if (alwaysSearch) await stopSearch();
     const fen = await engine.call('move', move);
     board.setPosition(fen, true);
+    markMove(move.start, move.end)
     elements.fenInput.value = fen;
-    handleTurn();
+    handleTurn(true);
+    if (alwaysSearch) await startSearch();
+}
+
+const decrementPV = () => {
+    if (elements.pvList.children.length === 0) return;
+    elements.pvList.removeChild(elements.pvList.firstChild);
+    elements.pvList.firstChild.addEventListener("click", async () => {
+        const move = elements.pvList.firstChild.innerText;
+        board.removeArrows(ARROW_TYPE.default);
+        makeMove({start: move.substring(0, 2), end: move.substring(2, 4)});
+    })
 }
 
 const log = (type, content) => {
@@ -259,8 +323,6 @@ const inputHandler = (event) => {
                 return false
             }
 
-            markMove(event.squareFrom, event.squareTo)
-
             if (move.promotionType !== "0") {
                 board.showPromotionDialog(event.squareTo, (move.player === "0") ? COLOR.white : COLOR.black, (result) => {
                     switch (result.piece) {
@@ -293,9 +355,15 @@ const inputHandler = (event) => {
     }
 }
 
-function markMove(start, end) {
-    console.log(`marking move ${start}${end}`)
+const markMove = (start, end) => {
     board.removeMarkers(MARKER_TYPE.square)
     board.addMarker(MARKER_TYPE.square, start)
     board.addMarker(MARKER_TYPE.square, end)
+}
+
+const toggleEngineFeatures = (on) => {
+    elements.engineMoveBtn.disabled = !on;
+    elements.alwaysSearch.disabled = !on;
+    elements.autoWhite.disabled = !on;
+    elements.autoBlack.disabled = !on;
 }
