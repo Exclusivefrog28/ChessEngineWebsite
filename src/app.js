@@ -92,6 +92,7 @@ engine
         elements.ttMeter.setAttribute('stroke-dashoffset', ((ttPercent - 1) * (-209) + 36).toFixed(2))
     })
     .register('updatePV', (pv) => {
+        board.removeArrows(ARROW_TYPE.default);
         elements.pvDiv.style.display = "block";
         const pvMoves = pv.split(" ");
         elements.pvList.innerHTML = "";
@@ -130,7 +131,6 @@ engine
     })
 
 const handleTurn = (switchPlayer = true, clearPV = true) => {
-    board.removeMarkers(MARKER_TYPE.square);
     board.removeMarkers(MARKER_TYPE.frame);
     updateMoves();
     updateEval();
@@ -153,7 +153,8 @@ const playEngineMove = async () => {
     }, 10);
 
 
-    const result = await engine.call('search');
+    await engine.call('startSearch');
+    const result = await engine.call('stopSearch');
 
     clearInterval(interval);
     elements.engineLoading.style.visibility = "hidden";
@@ -293,6 +294,7 @@ const inputHandler = (event) => {
 }
 
 function markMove(start, end) {
+    console.log(`marking move ${start}${end}`)
     board.removeMarkers(MARKER_TYPE.square)
     board.addMarker(MARKER_TYPE.square, start)
     board.addMarker(MARKER_TYPE.square, end)
