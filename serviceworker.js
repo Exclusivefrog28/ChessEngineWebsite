@@ -1,4 +1,4 @@
-const VERSION = "v0.9.5";
+const VERSION = "v0.9.6";
 const CACHE_NAME = `chessengine-${VERSION}`;
 
 const APP_STATIC_RESOURES = [
@@ -34,7 +34,8 @@ const APP_STATIC_RESOURES = [
     "/src/cm-chessboard/view/PositionAnimationsQueue.js",
     "/src/cm-chessboard/view/VisualMoveInput.js",
     "/src/cm-chessboard/Chessboard.js",
-    "/android-chrome-512x512.png",
+    "/android-chrome-192x192.png",
+    "/android-chrome-512x512.png"
 ]
 /* Edited version of: coi-serviceworker v0.1.6 - Guido Zuidhof, licensed under MIT */
 // From here: https://github.com/gzuidhof/coi-serviceworker
@@ -88,6 +89,28 @@ if (typeof window === 'undefined') {
         e.respondWith(handleFetch(e.request)); // respondWith must be executed synchonously (but can be passed a Promise)
     });
 
+    self.addEventListener("install", (event) => {
+        event.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_STATIC_RESOURES))
+        )
+    })
+    self.addEventListener("activate", (event) => {
+        event.waitUntil(
+            (async () => {
+                const names = await caches.keys();
+                await Promise.all(
+                    names.map((name) => {
+                        if (name !== CACHE_NAME) {
+                            return caches.delete(name);
+                        }
+                    }),
+                );
+                console.log("Old caches deleted");
+                await clients.claim();
+            })(),
+        );
+    });
+
 } else {
     (async function () {
         const src = window.document.currentScript.src;
@@ -103,39 +126,8 @@ if (typeof window === 'undefined') {
                 window.location.reload();
             });
 
-            registration.addEventListener("install", (event) => {
-                event.waitUntil(
-                    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_STATIC_RESOURES))
-                )
-            })
-            registration.addEventListener("activate", (event) => {
-                event.waitUntil(
-                    (async () => {
-                        let registrations = await navigator.serviceWorker.getRegistrations();
-                        for (let registration of registrations) {
-                            if (registration.active && !registration.active.scriptURL.includes("serviceworker.js")) {
-                                await registration.unregister();
-                                console.log("Old service worker unregistered");
-                            }
-                        }
-                        const names = await caches.keys();
-                        await Promise.all(
-                            names.map((name) => {
-                                if (name !== CACHE_NAME) {
-                                    return caches.delete(name);
-                                }
-                            }),
-                        );
-                        await clients.claim();
-                    })(),
-                );
-            });
-
-            // If the registration is active, but it's not controlling the page
-            if (registration.active && !navigator.serviceWorker.controller) {
-                console.log("Reloading page to make use of COOP/COEP Service Worker.");
-                window.location.reload();
-            }
+            console.log("Reloading page to make use of COOP/COEP Service Worker.");
+            window.location.reload();
         }
     })();
 }

@@ -1,10 +1,10 @@
 export function sigmoid(x) {
-    return 1 / (1 + Math.exp(-x));
+    return 1 / (1 + Math.exp(-0.1 * x));
 }
 
 export function displayScore(score) {
     if (score < 2147483382) return score;
-    let distance = - (score - 2147483647);
+    let distance = -(score - 2147483647);
     distance = Math.ceil(distance / 2);
     return `mate in ${distance}`;
 }

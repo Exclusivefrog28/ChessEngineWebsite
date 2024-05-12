@@ -145,8 +145,7 @@ engine
         })
     })
     .register('updateEvaluation', (score) => {
-        console.log('updateEvaluation')
-        updateEval(-score);
+        updateEval(score);
     })
     .register('log', (msg) => {
         const msgParts = msg.split(' ');
@@ -158,13 +157,14 @@ engine
 
 const handleTurn = async (switchPlayer = true) => {
     board.removeMarkers(MARKER_TYPE.frame);
+    if (switchPlayer) whiteToMove = !whiteToMove;
     await updateMoves();
     await updateEval();
-    if (switchPlayer) whiteToMove = !whiteToMove;
     decrementPV();
     if ((whiteToMove && elements.autoWhite.checked) || (!whiteToMove && elements.autoBlack.checked)) {
-        await playEngineMove()
+        playEngineMove()
     }
+    console.log(whiteToMove)
 }
 
 const startSearch = async () => {
@@ -179,7 +179,6 @@ const stopSearch = async (timeOut) => {
     searching = false;
     return result;
 }
-
 
 const playEngineMove = async () => {
     if (alwaysSearch) await stopSearch(0)
@@ -241,7 +240,6 @@ const updateMoves = async () => {
         case 'stalemate':
             elements.winner.textContent = "It's a draw!"
             elements.winMethod.textContent = "by stalemate"
-
             break;
     }
     elements.gameResults.style.display = "block"
