@@ -164,7 +164,6 @@ const handleTurn = async (switchPlayer = true) => {
     if ((whiteToMove && elements.autoWhite.checked) || (!whiteToMove && elements.autoBlack.checked)) {
         playEngineMove()
     }
-    console.log(whiteToMove)
 }
 
 const startSearch = async () => {
