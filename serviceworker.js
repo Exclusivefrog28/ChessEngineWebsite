@@ -1,4 +1,4 @@
-const VERSION = "v1.0.0";
+const VERSION = "v1.0.1";
 const CACHE_NAME = `chessengine-${VERSION}`;
 
 const APP_STATIC_RESOURES = [

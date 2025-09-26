@@ -250,13 +250,13 @@ const updateMoves = async () => {
 }
 
 const makeMove = async (move) => {
-    if (alwaysSearch) await stopSearch();
+    if (alwaysSearch) await stopSearch(0);
     const fen = await engine.call('move', move);
+    if (alwaysSearch && !elements.autoWhite.checked && !elements.autoBlack.checked) await startSearch();
     board.setPosition(fen, true);
     markMove(move.start, move.end)
     elements.fenInput.value = fen;
     handleTurn(true);
-    if (alwaysSearch) await startSearch();
 }
 
 const decrementPV = () => {
